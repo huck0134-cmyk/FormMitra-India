@@ -1,0 +1,556 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>FormMitra India - Free Online Tools</title>
+
+  <meta name="description" content="FormMitra India provides free online tools for photo editing, PDF, calculators, resume, QR code, typing and everyday digital work.">
+
+  <meta name="keywords" content="FormMitra India, online tools, PDF tools, passport photo, resume maker, GST calculator, EMI calculator">
+
+  <meta name="theme-color" content="#0f172a">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 16px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #38bdf8;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 65px 20px;
+      background: linear-gradient(135deg, #0f172a, #1e40af);
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: auto;
+      line-height: 1.7;
+      color: #dbeafe;
+    }
+
+    .hero-search {
+      margin: 25px auto 0;
+      max-width: 550px;
+    }
+
+    .hero-search input {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .trust {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 20px;
+      background: white;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 35px 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section-title h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .section-title p {
+      color: #64748b;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .tool-card {
+      display: block;
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      text-decoration: none;
+      color: #172033;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      transition: 0.2s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-color: #38bdf8;
+    }
+
+    .tool-icon {
+      font-size: 35px;
+      margin-bottom: 12px;
+    }
+
+    .tool-card h3 {
+      margin: 8px 0;
+      font-size: 19px;
+    }
+
+    .tool-card p {
+      color: #64748b;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .workspace {
+      margin-top: 50px;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .about {
+      background: white;
+      padding: 30px;
+      margin-top: 35px;
+      border-radius: 15px;
+      line-height: 1.7;
+    }
+
+    footer {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: #38bdf8;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .no-results {
+      text-align: center;
+      display: none;
+      padding: 30px;
+      color: #64748b;
+    }
+
+    @media(max-width: 600px) {
+      header {
+        justify-content: center;
+        text-align: center;
+      }
+
+      nav {
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: 29px;
+      }
+
+      .section-title h2 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">FormMitra India</div>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#tools">All Tools</a>
+    <a href="#about">About</a>
+    <a href="privacy.html">Privacy Policy</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h1>Your Free Online Digital Toolkit</h1>
+
+  <p>
+    Photo, PDF, calculators, resume, QR code and useful digital tools.
+    Simple, fast and accessible from your mobile or computer.
+  </p>
+
+  <div class="hero-search">
+    <input
+      type="search"
+      id="toolSearch"
+      placeholder="Search tools... e.g. PDF, Resume, GST"
+      aria-label="Search tools"
+    >
+  </div>
+</section>
+
+<div class="trust">
+  <span>✅ Free Online Tools</span>
+  <span>📱 Mobile Friendly</span>
+  <span>⚡ Easy to Use</span>
+  <span>🌐 No Software Installation</span>
+</div>
+
+<main>
+
+  <section id="tools">
+    <div class="section-title">
+      <h2>Explore All Tools</h2>
+      <p>Select a tool and start using it.</p>
+    </div>
+
+    <div class="tool-grid" id="toolGrid">
+
+      <!-- EXISTING HOMEPAGE TOOLS -->
+
+      <a class="tool-card" href="#workspace" data-search="photo resize image resize">
+        <div class="tool-icon">📸</div>
+        <h3>Photo Resize</h3>
+        <p>Resize photos for online forms and documents.</p>
+      </a>
+
+      <a class="tool-card" href="#workspace" data-search="image compressor compress photo">
+        <div class="tool-icon">🗜️</div>
+        <h3>Image Compressor</h3>
+        <p>Reduce image file size easily.</p>
+      </a>
+
+      <a class="tool-card" href="#workspace" data-search="image to pdf convert">
+        <div class="tool-icon">📄</div>
+        <h3>Image to PDF</h3>
+        <p>Convert images into PDF documents.</p>
+      </a>
+
+      <!-- PHOTO TOOLS -->
+
+      <a class="tool-card" href="tools/passport-photo.html" data-search="passport photo size">
+        <div class="tool-icon">🪪</div>
+        <h3>Passport Photo Maker</h3>
+        <p>Create passport-size photos.</p>
+      </a>
+
+      <a class="tool-card" href="tools/photo-crop.html" data-search="photo crop image crop">
+        <div class="tool-icon">✂️</div>
+        <h3>Photo Cropper</h3>
+        <p>Crop photos into different shapes.</p>
+      </a>
+
+      <a class="tool-card" href="tools/background-changer.html" data-search="photo background changer">
+        <div class="tool-icon">🎨</div>
+        <h3>Photo Background Changer</h3>
+        <p>Change simple photo backgrounds.</p>
+      </a>
+
+      <a class="tool-card" href="tools/photo-sheet.html" data-search="photo sheet print">
+        <div class="tool-icon">🖼️</div>
+        <h3>Photo Sheet Maker</h3>
+        <p>Arrange photos for printing.</p>
+      </a>
+
+      <!-- PDF TOOLS -->
+
+      <a class="tool-card" href="tools/pdf-merge.html" data-search="pdf merge combine">
+        <div class="tool-icon">📚</div>
+        <h3>PDF Merge</h3>
+        <p>Combine multiple PDF files.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-split.html" data-search="pdf split extract pages">
+        <div class="tool-icon">📑</div>
+        <h3>PDF Splitter</h3>
+        <p>Extract selected PDF pages.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-rotate.html" data-search="pdf rotate">
+        <div class="tool-icon">🔄</div>
+        <h3>PDF Rotate</h3>
+        <p>Rotate PDF pages.</p>
+      </a>
+
+      <a class="tool-card" href="tools/jpg-to-pdf.html" data-search="jpg jpeg image to pdf">
+        <div class="tool-icon">📄</div>
+        <h3>JPG to PDF</h3>
+        <p>Convert JPG images into PDF.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-to-jpg.html" data-search="pdf to jpg image">
+        <div class="tool-icon">🖼️</div>
+        <h3>PDF to JPG</h3>
+        <p>Convert PDF pages into images.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-delete-pages.html" data-search="pdf delete remove pages">
+        <div class="tool-icon">🗑️</div>
+        <h3>PDF Page Remover</h3>
+        <p>Remove unwanted PDF pages.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-page-number.html" data-search="pdf page number">
+        <div class="tool-icon">🔢</div>
+        <h3>PDF Page Number</h3>
+        <p>Add page numbers to PDFs.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-watermark.html" data-search="pdf watermark">
+        <div class="tool-icon">💧</div>
+        <h3>PDF Watermark</h3>
+        <p>Add watermark text to PDF files.</p>
+      </a>
+
+      <a class="tool-card" href="tools/pdf-text-extractor.html" data-search="pdf text extractor copy text">
+        <div class="tool-icon">📝</div>
+        <h3>PDF Text Extractor</h3>
+        <p>Extract text from PDF documents.</p>
+      </a>
+
+      <!-- DOCUMENT AND TEXT TOOLS -->
+
+      <a class="tool-card" href="tools/resume-builder.html" data-search="resume cv maker">
+        <div class="tool-icon">📋</div>
+        <h3>Resume Builder</h3>
+        <p>Create a simple professional resume.</p>
+      </a>
+
+      <a class="tool-card" href="tools/letter-writer.html" data-search="letter application writer">
+        <div class="tool-icon">✉️</div>
+        <h3>Letter & Application Writer</h3>
+        <p>Create basic letters and applications.</p>
+      </a>
+
+      <a class="tool-card" href="tools/hindi-typing.html" data-search="hindi typing english hindi">
+        <div class="tool-icon">⌨️</div>
+        <h3>Hindi Typing Tool</h3>
+        <p>Type Hindi using English letters.</p>
+      </a>
+
+      <a class="tool-card" href="tools/image-to-text.html" data-search="image to text OCR">
+        <div class="tool-icon">🔍</div>
+        <h3>Image to Text (OCR)</h3>
+        <p>Extract text from images.</p>
+      </a>
+
+      <a class="tool-card" href="tools/word-counter.html" data-search="word character counter">
+        <div class="tool-icon">🔠</div>
+        <h3>Word Counter</h3>
+        <p>Count words and characters.</p>
+      </a>
+
+      <a class="tool-card" href="tools/text-case-converter.html" data-search="text case uppercase lowercase">
+        <div class="tool-icon">🔡</div>
+        <h3>Text Case Converter</h3>
+        <p>Convert text to different cases.</p>
+      </a>
+
+      <!-- CALCULATORS -->
+
+      <a class="tool-card" href="tools/age-calculator.html" data-search="age calculator date birth">
+        <div class="tool-icon">🎂</div>
+        <h3>Age Calculator</h3>
+        <p>Calculate age from date of birth.</p>
+      </a>
+
+      <a class="tool-card" href="tools/date-calculator.html" data-search="date calculator days">
+        <div class="tool-icon">📅</div>
+        <h3>Date Calculator</h3>
+        <p>Calculate days between dates.</p>
+      </a>
+
+      <a class="tool-card" href="tools/eligibility-calculator.html" data-search="eligibility age qualification">
+        <div class="tool-icon">🎓</div>
+        <h3>Eligibility Calculator</h3>
+        <p>Check basic age and qualification criteria.</p>
+      </a>
+
+      <a class="tool-card" href="tools/gst-calculator.html" data-search="gst calculator tax">
+        <div class="tool-icon">🧾</div>
+        <h3>GST Calculator</h3>
+        <p>Calculate GST and tax amounts.</p>
+      </a>
+
+      <a class="tool-card" href="tools/emi-calculator.html" data-search="emi loan calculator">
+        <div class="tool-icon">🏦</div>
+        <h3>EMI Calculator</h3>
+        <p>Calculate monthly loan EMI.</p>
+      </a>
+
+      <a class="tool-card" href="tools/salary-calculator.html" data-search="salary calculator">
+        <div class="tool-icon">💰</div>
+        <h3>Salary Calculator</h3>
+        <p>Calculate salary and deductions.</p>
+      </a>
+
+      <!-- BUSINESS TOOLS -->
+
+      <a class="tool-card" href="tools/invoice-generator.html" data-search="invoice bill generator">
+        <div class="tool-icon">🧮</div>
+        <h3>Invoice Generator</h3>
+        <p>Create and print basic invoices.</p>
+      </a>
+
+      <a class="tool-card" href="tools/qr-generator.html" data-search="qr code generator">
+        <div class="tool-icon">📱</div>
+        <h3>QR Code Generator</h3>
+        <p>Create QR codes for links and text.</p>
+      </a>
+
+      <a class="tool-card" href="tools/barcode-generator.html" data-search="barcode generator">
+        <div class="tool-icon">🏷️</div>
+        <h3>Barcode Generator</h3>
+        <p>Generate basic barcodes.</p>
+      </a>
+
+    </div>
+
+    <div class="no-results" id="noResults">
+      No tools found. Try another search.
+    </div>
+  </section>
+
+  <!-- EXISTING WORKSPACE: KEEP THIS FOR SCRIPT.JS -->
+
+  <section class="workspace" id="workspace">
+    <div class="section-title">
+      <h2>Quick Tools Workspace</h2>
+      <p>Use the quick tools available below.</p>
+    </div>
+
+    <div id="toolWorkspace">
+      <!-- Your existing script.js may render tools here -->
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <h2>About FormMitra India</h2>
+
+    <p>
+      FormMitra India is an online platform designed to provide useful
+      digital tools for everyday tasks. Our tools include photo utilities,
+      PDF tools, calculators, document tools and business utilities.
+    </p>
+
+    <p>
+      We aim to make common online tasks easier for students, job seekers,
+      shopkeepers and everyday internet users.
+    </p>
+
+    <p>
+      Please verify important official forms, eligibility requirements,
+      tax calculations and financial information with the relevant
+      official authority or professional before relying on them.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <p>© <span id="currentYear"></span> FormMitra India. All rights reserved.</p>
+
+  <p>
+    <a href="#home">Home</a>
+    <a href="#tools">Tools</a>
+    <a href="#about">About</a>
+    <a href="privacy.html">Privacy Policy</a>
+  </p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js"></script>
+
+<script>
+  document.getElementById("currentYear").textContent =
+    new Date().getFullYear();
+
+  const searchInput = document.getElementById("toolSearch");
+  const toolCards = document.querySelectorAll(".tool-card");
+  const noResults = document.getElementById("noResults");
+
+  searchInput.addEventListener("input", function () {
+    const searchValue = this.value.toLowerCase().trim();
+    let visibleCount = 0;
+
+    toolCards.forEach(function (card) {
+      const text = (
+        card.innerText + " " + (card.dataset.search || "")
+      ).toLowerCase();
+
+      if (text.includes(searchValue)) {
+        card.style.display = "block";
+        visibleCount++;
+      } else {
+        card.style.display = "none";
+      }
+    });
+
+    noResults.style.display = visibleCount === 0 ? "block" : "none";
+  });
+</script>
+
+</body>
+</html>

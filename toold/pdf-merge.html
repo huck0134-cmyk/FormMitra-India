@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Merger - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;
+  background:#f3f6fb;color:#222;padding:20px
+}
+.container{
+  max-width:650px;margin:30px auto;background:white;
+  padding:25px;border-radius:15px;
+  box-shadow:0 4px 20px #0001
+}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input{width:100%;padding:12px;margin:15px 0}
+button{
+  width:100%;padding:14px;border:0;border-radius:8px;
+  background:#174ea6;color:white;font-size:16px;
+  cursor:pointer;margin-top:10px
+}
+button:hover{background:#0d3677}
+#status{margin-top:15px;text-align:center}
+#fileList{padding-left:20px}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>📄 PDF Merge Tool</h1>
+  <p>Combine multiple PDF files into one PDF.</p>
+
+  <input type="file" id="pdfFiles" accept="application/pdf" multiple>
+
+  <ul id="fileList"></ul>
+
+  <button onclick="mergePDFs()">Merge PDF Files</button>
+
+  <div id="status"></div>
+
+  <a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+const fileInput = document.getElementById("pdfFiles");
+const fileList = document.getElementById("fileList");
+const statusBox = document.getElementById("status");
+
+fileInput.addEventListener("change", function(){
+  fileList.innerHTML = "";
+
+  Array.from(this.files).forEach((file, index)=>{
+    const li = document.createElement("li");
+    li.textContent = `${index + 1}. ${file.name}`;
+    fileList.appendChild(li);
+  });
+});
+
+async function mergePDFs(){
+  const files = fileInput.files;
+
+  if(files.length < 2){
+    statusBox.textContent = "Please select at least 2 PDF files.";
+    return;
+  }
+
+  try{
+    statusBox.textContent = "Merging PDFs... Please wait.";
+
+    const mergedPDF = await PDFLib.PDFDocument.create();
+
+    for(const file of files){
+      const bytes = await file.arrayBuffer();
+      const pdf = await PDFLib.PDFDocument.load(bytes);
+
+      const pages = await mergedPDF.copyPages(
+        pdf,
+        pdf.getPageIndices()
+      );
+
+      pages.forEach(page => mergedPDF.addPage(page));
+    }
+
+    const mergedBytes = await mergedPDF.save();
+    const blob = new Blob([mergedBytes], {
+      type: "application/pdf"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "FormMitra-Merged.pdf";
+    link.click();
+
+    URL.revokeObjectURL(url);
+    statusBox.textContent = "✅ PDF merged successfully!";
+  }
+  catch(error){
+    console.error(error);
+    statusBox.textContent =
+      "Error merging PDFs. Please check your PDF files and try again.";
+  }
+}
+</script>
+</body>
+</html>

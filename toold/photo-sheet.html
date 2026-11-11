@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passport Photo Sheet Maker | FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fc;color:#172033}
+header{background:#fff;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb}
+.logo{font-size:21px;font-weight:bold}
+.logo span{color:#2563eb}
+a{color:#2563eb;text-decoration:none;font-weight:bold}
+.container{max-width:900px;margin:35px auto;padding:20px}
+.panel{background:#fff;padding:25px;border-radius:15px;box-shadow:0 5px 25px #00000008}
+label{display:block;font-weight:bold;margin:15px 0 7px}
+input,select{width:100%;padding:12px;border:1px solid #d6deea;border-radius:8px}
+button{background:#2563eb;color:white;border:0;padding:13px 20px;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:15px}
+button:hover{background:#1d4ed8}
+canvas{max-width:100%;height:auto;display:block;margin:20px auto;border:1px solid #ddd;background:white}
+#message{font-weight:bold;color:#15803d}
+.note{font-size:13px;color:#64748b;line-height:1.6}
+footer{text-align:center;padding:25px;color:#64748b}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">FormMitra <span>India</span></div>
+  <a href="../index.html">← Back Home</a>
+</header>
+
+<div class="container">
+
+<h1>Passport Photo Sheet Maker</h1>
+<p>Create multiple passport photos on one printable sheet.</p>
+
+<div class="panel">
+
+<label>Upload Passport Photo</label>
+<input type="file" id="photoInput" accept="image/*">
+
+<label>Photo Size</label>
+<select id="photoSize">
+  <option value="413,531">35 × 45 mm Passport Photo</option>
+  <option value="600,600">2 × 2 inch Square Photo</option>
+  <option value="300,300">300 × 300 px Square Photo</option>
+</select>
+
+<label>Number of Copies</label>
+<select id="copies">
+  <option value="4">4 Copies</option>
+  <option value="6">6 Copies</option>
+  <option value="8">8 Copies</option>
+  <option value="10">10 Copies</option>
+  <option value="12">12 Copies</option>
+  <option value="16">16 Copies</option>
+  <option value="20">20 Copies</option>
+</select>
+
+<label>Sheet Size</label>
+<select id="sheetSize">
+  <option value="a4">A4 Sheet</option>
+  <option value="4x6">4 × 6 inch Photo Paper</option>
+</select>
+
+<label>Spacing Between Photos (px)</label>
+<input type="number" id="spacing" value="15" min="0" max="100">
+
+<button id="createBtn">Create Photo Sheet</button>
+<button id="downloadBtn" hidden>Download Photo Sheet</button>
+<button onclick="window.print()">Print Sheet</button>
+
+<p id="message"></p>
+
+<canvas id="canvas" hidden></canvas>
+
+<p class="note">
+For accurate printing, print at 100% / Actual Size and disable
+Fit to Page. Final physical dimensions depend on printer settings.
+</p>
+
+</div>
+</div>
+
+<footer>© FormMitra India</footer>
+
+<script>
+const photoInput=document.getElementById("photoInput");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const message=document.getElementById("message");
+const downloadBtn=document.getElementById("downloadBtn");
+
+let image=null;
+let downloadURL=null;
+
+photoInput.addEventListener("change",()=>{
+
+  const file=photoInput.files[0];
+
+  if(!file || !file.type.startsWith("image/")){
+    message.textContent="Please select a valid image.";
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+
+    image=new Image();
+
+    image.onload=()=>{
+      message.textContent="Photo uploaded successfully.";
+    };
+
+    image.src=reader.result;
+
+  };
+
+  reader.readAsDataURL(file);
+
+});
+
+document.getElementById("createBtn").addEventListener("click",()=>{
+
+  if(!image){
+    message.textContent="Please upload a photo first.";
+    return;
+  }
+
+  const dimensions=document.getElementById("photoSize").value.split(",");
+  const photoW=Number(dimensions[0]);
+  const photoH=Number(dimensions[1]);
+
+  const copies=Number(document.getElementById("copies").value);
+  const spacing=Number(document.getElementById("spacing").value);
+
+  const sheet=document.getElementById("sheetSize").value;
+
+  // A4 at approximately 150 DPI
+  canvas.width=sheet==="a4"?1240:600;
+  canvas.height=sheet==="a4"?1754:900;
+
+  canvas.hidden=false;
+
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const margin=40;
+  const availableW=canvas.width-margin*2;
+  const availableH=canvas.height-margin*2;
+
+  const cols=Math.max(1,Math.floor((availableW+spacing)/(photoW+spacing)));
+  const rows=Math.max(1,Math.floor((availableH+spacing)/(photoH+spacing)));
+
+  const capacity=cols*rows;
+
+  if(copies>capacity){
+    message.textContent="Too many photos for this sheet size. Choose fewer copies or smaller photos.";
+    return;
+  }
+
+  const totalW=cols*photoW+(cols-1)*spacing;
+  const totalH=rows*photoH+(rows-1)*spacing;
+
+  const startX=(canvas.width-totalW)/2;
+  const startY=(canvas.height-totalH)/2;
+
+  for(let i=0;i<copies;i++){
+
+    const row=Math.floor(i/cols);
+    const col=i%cols;
+
+    const x=startX+col*(photoW+spacing);
+    const y=startY+row*(photoH+spacing);
+
+    ctx.drawImage(image,x,y,photoW,photoH);
+
+    ctx.strokeStyle="#cccccc";
+    ctx.lineWidth=2;
+    ctx.strokeRect(x,y,photoW,photoH);
+
+  }
+
+  canvas.toBlob(blob=>{
+
+    if(!blob){
+      message.textContent="Could not create photo sheet.";
+      return;
+    }
+
+    if(downloadURL)URL.revokeObjectURL(downloadURL);
+
+    downloadURL=URL.createObjectURL(blob);
+
+    downloadBtn.hidden=false;
+    message.textContent="Photo sheet created successfully!";
+
+  },"image/jpeg",0.95);
+
+});
+
+downloadBtn.addEventListener("click",()=>{
+
+  if(!downloadURL)return;
+
+  const link=document.createElement("a");
+  link.href=downloadURL;
+  link.download="FormMitra-Photo-Sheet.jpg";
+  link.click();
+
+});
+</script>
+
+</body>
+</html>

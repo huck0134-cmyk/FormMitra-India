@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image to Text OCR - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:700px;margin:25px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input,select{width:100%;padding:12px;margin:12px 0}
+button{padding:13px;background:#174ea6;color:white;border:0;border-radius:8px;cursor:pointer;margin:5px;font-size:15px}
+textarea{width:100%;min-height:220px;padding:12px;font-size:17px;margin-top:12px}
+#preview{text-align:center;margin:15px 0}
+#preview img{max-width:100%;max-height:350px}
+#status{margin-top:15px;text-align:center;overflow-wrap:anywhere}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>📝 Image to Text OCR</h1>
+<p>Extract text from images, screenshots and scanned documents.</p>
+
+<input type="file" id="imageFile" accept="image/*">
+
+<label>Select OCR Language:</label>
+<select id="language">
+<option value="eng">English</option>
+<option value="hin">Hindi</option>
+<option value="eng+hin">English + Hindi</option>
+</select>
+
+<div id="preview"></div>
+
+<button onclick="extractText()">Extract Text</button>
+<button onclick="copyText()">Copy Text</button>
+<button onclick="downloadText()">Download TXT</button>
+
+<div id="status"></div>
+
+<textarea id="output" placeholder="Extracted text will appear here..."></textarea>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+const imageFile=document.getElementById("imageFile");
+const preview=document.getElementById("preview");
+
+imageFile.addEventListener("change",function(){
+  preview.innerHTML="";
+
+  const file=this.files[0];
+
+  if(file){
+    const img=document.createElement("img");
+    img.src=URL.createObjectURL(file);
+    preview.appendChild(img);
+  }
+});
+
+async function extractText(){
+  const file=imageFile.files[0];
+  const status=document.getElementById("status");
+  const output=document.getElementById("output");
+  const language=document.getElementById("language").value;
+
+  if(!file){
+    status.textContent="Please upload an image first.";
+    return;
+  }
+
+  if(typeof Tesseract==="undefined"){
+    status.textContent="OCR library failed to load. Check internet connection.";
+    return;
+  }
+
+  try{
+    output.value="";
+    status.textContent="Starting OCR... Please wait.";
+
+    const result=await Tesseract.recognize(
+      file,
+      language,
+      {
+        logger:function(info){
+          if(info.status==="recognizing text"){
+            status.textContent=
+              "Reading image... "+Math.round(info.progress*100)+"%";
+          }else if(info.status){
+            status.textContent=info.status+"...";
+          }
+        }
+      }
+    );
+
+    output.value=result.data.text;
+    status.textContent="✅ Text extracted successfully!";
+  }
+  catch(error){
+    console.error(error);
+    status.textContent="OCR failed. Try a clearer image.";
+  }
+}
+
+async function copyText(){
+  const text=document.getElementById("output").value;
+
+  if(!text){
+    alert("Please extract text first.");
+    return;
+  }
+
+  try{
+    await navigator.clipboard.writeText(text);
+    document.getElementById("status").textContent="Text copied!";
+  }catch(error){
+    const output=document.getElementById("output");
+    output.select();
+    document.execCommand("copy");
+    document.getElementById("status").textContent="Text copied!";
+  }
+}
+
+function downloadText(){
+  const text=document.getElementById("output").value;
+
+  if(!text){
+    alert("Please extract text first.");
+    return;
+  }
+
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="FormMitra-Extracted-Text.txt";
+  link.click();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+</script>
+
+</body>
+</html>

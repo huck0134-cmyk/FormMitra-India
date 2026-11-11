@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF to JPG - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
+.container{max-width:650px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input{width:100%;padding:12px;margin:12px 0}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#status{text-align:center;margin-top:15px}
+#output{margin-top:20px}
+img{max-width:100%;border:1px solid #ddd;margin:10px 0}
+.download{display:block;padding:10px;background:#16803c;color:white;text-align:center;text-decoration:none;border-radius:6px;margin:10px 0}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>📄 PDF to JPG Converter</h1>
+<p>Convert PDF pages into JPG images.</p>
+
+<input type="file" id="pdfFile" accept="application/pdf">
+
+<button onclick="convertPDF()">Convert PDF to JPG</button>
+
+<div id="status"></div>
+<div id="output"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function convertPDF(){
+  const file=document.getElementById("pdfFile").files[0];
+  const status=document.getElementById("status");
+  const output=document.getElementById("output");
+
+  output.innerHTML="";
+
+  if(!file){
+    status.textContent="Please select a PDF file.";
+    return;
+  }
+
+  try{
+    status.textContent="Converting pages... Please wait.";
+
+    const bytes=await file.arrayBuffer();
+
+    const pdf=await pdfjsLib.getDocument({
+      data:new Uint8Array(bytes)
+    }).promise;
+
+    for(let i=1;i<=pdf.numPages;i++){
+      status.textContent=`Converting page ${i} of ${pdf.numPages}...`;
+
+      const page=await pdf.getPage(i);
+      const viewport=page.getViewport({scale:1.5});
+
+      const canvas=document.createElement("canvas");
+      const context=canvas.getContext("2d");
+
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+
+      await page.render({
+        canvasContext:context,
+        viewport:viewport
+      }).promise;
+
+      const imageURL=canvas.toDataURL("image/jpeg",0.92);
+
+      const heading=document.createElement("h3");
+      heading.textContent="Page "+i;
+      output.appendChild(heading);
+
+      const img=document.createElement("img");
+      img.src=imageURL;
+      output.appendChild(img);
+
+      const link=document.createElement("a");
+      link.href=imageURL;
+      link.download=`FormMitra-Page-${i}.jpg`;
+      link.textContent="Download Page "+i+" JPG";
+      link.className="download";
+      output.appendChild(link);
+    }
+
+    status.textContent="✅ PDF converted successfully!";
+  }
+  catch(error){
+    console.error(error);
+    status.textContent="Conversion failed. Please try another PDF.";
+  }
+}
+</script>
+</body>
+</html>

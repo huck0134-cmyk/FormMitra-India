@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input{width:100%;padding:12px;margin:12px 0;font-size:16px}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#result{text-align:center;margin-top:20px;font-size:20px;font-weight:bold;color:#16803c}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>🎂 Age Calculator</h1>
+<p>Calculate your exact age in years, months and days.</p>
+
+<label>Date of Birth:</label>
+<input type="date" id="dob">
+
+<label>Calculate Age As Of:</label>
+<input type="date" id="asOf">
+
+<button onclick="calculateAge()">Calculate Age</button>
+
+<div id="result"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script>
+const today=new Date();
+
+function formatDate(date){
+  const year=date.getFullYear();
+  const month=String(date.getMonth()+1).padStart(2,"0");
+  const day=String(date.getDate()).padStart(2,"0");
+  return `${year}-${month}-${day}`;
+}
+
+document.getElementById("asOf").value=formatDate(today);
+
+function calculateAge(){
+  const dobValue=document.getElementById("dob").value;
+  const asOfValue=document.getElementById("asOf").value;
+  const result=document.getElementById("result");
+
+  if(!dobValue || !asOfValue){
+    result.textContent="Please select both dates.";
+    return;
+  }
+
+  const dob=new Date(dobValue+"T00:00:00");
+  const end=new Date(asOfValue+"T00:00:00");
+
+  if(dob>end){
+    result.textContent="Date of birth cannot be after the selected date.";
+    return;
+  }
+
+  let years=end.getFullYear()-dob.getFullYear();
+  let months=end.getMonth()-dob.getMonth();
+  let days=end.getDate()-dob.getDate();
+
+  if(days<0){
+    months--;
+
+    const previousMonthDays=new Date(
+      end.getFullYear(),
+      end.getMonth(),
+      0
+    ).getDate();
+
+    days+=previousMonthDays;
+  }
+
+  if(months<0){
+    years--;
+    months+=12;
+  }
+
+  result.innerHTML=
+    `Your Age:<br>${years} Years, ${months} Months, ${days} Days`;
+}
+</script>
+</body>
+</html>

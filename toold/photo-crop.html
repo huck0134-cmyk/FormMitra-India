@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Crop Tool | FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fc;color:#172033}
+header{background:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb}
+.logo{font-size:21px;font-weight:bold}
+.logo span{color:#2563eb}
+a{color:#2563eb;text-decoration:none;font-weight:bold}
+.container{max-width:900px;margin:35px auto;padding:20px}
+.panel{background:white;padding:25px;border-radius:15px;box-shadow:0 5px 25px #00000008}
+input,select{width:100%;padding:12px;border:1px solid #d6deea;border-radius:8px;margin:8px 0 15px}
+label{font-weight:bold;font-size:14px}
+button{background:#2563eb;color:white;border:0;padding:13px 20px;border-radius:8px;cursor:pointer;font-weight:bold;margin:5px 5px 5px 0}
+button:hover{background:#1d4ed8}
+canvas{max-width:100%;height:auto;display:block;margin:20px auto;border:1px dashed #aaa}
+#message{color:#15803d;font-weight:bold}
+.note{font-size:13px;color:#64748b;line-height:1.6}
+footer{text-align:center;padding:25px;color:#64748b;font-size:13px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">FormMitra <span>India</span></div>
+  <a href="../index.html">← Back Home</a>
+</header>
+
+<div class="container">
+  <h1>Photo Crop Tool</h1>
+  <p>Crop your image to square, passport or custom dimensions.</p>
+
+  <div class="panel">
+
+    <label>Select Image</label>
+    <input type="file" id="imageInput" accept="image/*">
+
+    <label>Crop Size</label>
+    <select id="cropSize">
+      <option value="1:1">Square (1:1)</option>
+      <option value="4:3">Landscape (4:3)</option>
+      <option value="3:4">Portrait (3:4)</option>
+      <option value="16:9">Wide (16:9)</option>
+      <option value="custom">Custom Ratio</option>
+    </select>
+
+    <div id="customFields" hidden>
+      <label>Width Ratio</label>
+      <input type="number" id="ratioWidth" value="1" min="1">
+
+      <label>Height Ratio</label>
+      <input type="number" id="ratioHeight" value="1" min="1">
+    </div>
+
+    <label>Output Width (pixels)</label>
+    <input type="number" id="outputWidth" value="600" min="1" max="5000">
+
+    <label>Output Height (pixels)</label>
+    <input type="number" id="outputHeight" value="600" min="1" max="5000">
+
+    <button id="cropBtn">Crop Image</button>
+    <button id="downloadBtn" hidden>Download Cropped Image</button>
+
+    <p id="message"></p>
+
+    <canvas id="canvas" hidden></canvas>
+
+    <p class="note">
+      This tool automatically crops the center of your image.
+      It does not provide manual face positioning yet.
+    </p>
+
+  </div>
+</div>
+
+<footer>© FormMitra India</footer>
+
+<script>
+const imageInput = document.getElementById("imageInput");
+const cropSize = document.getElementById("cropSize");
+const customFields = document.getElementById("customFields");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const message = document.getElementById("message");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let image = null;
+let downloadURL = null;
+
+cropSize.addEventListener("change", () => {
+  customFields.hidden = cropSize.value !== "custom";
+});
+
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+
+  if (!file || !file.type.startsWith("image/")) {
+    message.textContent = "Please select a valid image.";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    image = new Image();
+
+    image.onload = () => {
+      message.textContent =
+        "Image loaded: " + image.width + " × " + image.height;
+    };
+
+    image.src = reader.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+document.getElementById("cropBtn").addEventListener("click", () => {
+
+  if (!image) {
+    message.textContent = "Please upload an image first.";
+    return;
+  }
+
+  let ratioW, ratioH;
+
+  switch (cropSize.value) {
+    case "1:1": ratioW=1; ratioH=1; break;
+    case "4:3": ratioW=4; ratioH=3; break;
+    case "3:4": ratioW=3; ratioH=4; break;
+    case "16:9": ratioW=16; ratioH=9; break;
+    case "custom":
+      ratioW=Number(document.getElementById("ratioWidth").value);
+      ratioH=Number(document.getElementById("ratioHeight").value);
+      break;
+  }
+
+  if (!ratioW || !ratioH || ratioW<=0 || ratioH<=0) {
+    message.textContent="Please enter a valid crop ratio.";
+    return;
+  }
+
+  const outW=Number(document.getElementById("outputWidth").value);
+  const outH=Number(document.getElementById("outputHeight").value);
+
+  if (!Number.isInteger(outW) || !Number.isInteger(outH) ||
+      outW<1 || outH<1 || outW>5000 || outH>5000) {
+    message.textContent="Output dimensions must be between 1 and 5000.";
+    return;
+  }
+
+  const targetRatio=ratioW/ratioH;
+
+  let cropW=image.width;
+  let cropH=image.height;
+  let cropX=0;
+  let cropY=0;
+
+  if (image.width/image.height > targetRatio) {
+    cropW=image.height*targetRatio;
+    cropX=(image.width-cropW)/2;
+  } else {
+    cropH=image.width/targetRatio;
+    cropY=(image.height-cropH)/2;
+  }
+
+  canvas.width=outW;
+  canvas.height=outH;
+  canvas.hidden=false;
+
+  ctx.clearRect(0,0,outW,outH);
+
+  ctx.drawImage(
+    image,
+    cropX,cropY,cropW,cropH,
+    0,0,outW,outH
+  );
+
+  canvas.toBlob(blob => {
+
+    if (!blob) {
+      message.textContent="Could not crop image.";
+      return;
+    }
+
+    if (downloadURL) URL.revokeObjectURL(downloadURL);
+
+    downloadURL=URL.createObjectURL(blob);
+
+    downloadBtn.hidden=false;
+    message.textContent="Image cropped successfully!";
+
+  },"image/jpeg",0.95);
+
+});
+
+downloadBtn.addEventListener("click", () => {
+
+  if (!downloadURL) return;
+
+  const link=document.createElement("a");
+  link.href=downloadURL;
+  link.download="FormMitra-Cropped-Photo.jpg";
+  link.click();
+
+});
+</script>
+
+</body>
+</html>

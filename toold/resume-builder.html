@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Builder - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#222}
+.container{max-width:850px;margin:20px auto;background:white;padding:20px;border-radius:12px}
+h1{text-align:center;color:#174ea6}
+h2{color:#174ea6;border-bottom:1px solid #ddd;padding-bottom:8px}
+input,textarea{width:100%;padding:11px;margin:7px 0;border:1px solid #ccc;border-radius:6px;font-size:15px}
+textarea{min-height:90px;resize:vertical}
+button{padding:12px;border:0;border-radius:6px;background:#174ea6;color:white;font-size:15px;cursor:pointer;margin:8px 4px}
+.preview{border:1px solid #ccc;padding:25px;margin-top:20px;background:white;min-height:400px}
+.resume-name{text-align:center;color:#174ea6;font-size:28px;margin-bottom:5px}
+.contact{text-align:center;font-size:13px;color:#444}
+.section-title{border-bottom:2px solid #174ea6;padding-bottom:5px;color:#174ea6;margin-top:20px}
+.back{display:block;text-align:center;margin-top:20px}
+@media print{
+ body{background:white;padding:0}
+ .container{max-width:none;margin:0;padding:0}
+ .form-area,.buttons,.back,h1{display:none!important}
+ .preview{border:0;margin:0;padding:15px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>📄 FormMitra Resume Builder</h1>
+
+<div class="form-area">
+<h2>Personal Details</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Mobile Number">
+<input id="email" placeholder="Email Address">
+<textarea id="address" placeholder="Address"></textarea>
+
+<h2>Career Objective</h2>
+<textarea id="objective" placeholder="Write your career objective"></textarea>
+
+<h2>Education</h2>
+<textarea id="education" placeholder="Example: 12th Pass - Arts, Jammu Board, 2023"></textarea>
+
+<h2>Skills</h2>
+<textarea id="skills" placeholder="Example: MS Excel, Tally Prime, Accounting"></textarea>
+
+<h2>Work Experience</h2>
+<textarea id="experience" placeholder="Company name, job role and experience"></textarea>
+
+<h2>Additional Details</h2>
+<textarea id="additional" placeholder="Languages, certificates or other details"></textarea>
+
+<button onclick="generateResume()">Generate Resume Preview</button>
+</div>
+
+<div class="buttons">
+<button onclick="window.print()">Download / Save Resume as PDF</button>
+</div>
+
+<div class="preview" id="preview">
+<p>Your resume preview will appear here.</p>
+</div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+
+</div>
+
+<script>
+function getValue(id){
+  return document.getElementById(id).value.trim();
+}
+
+function escapeHTML(text){
+  return text.replace(/[&<>"']/g,function(character){
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[character];
+  });
+}
+
+function formatText(text){
+  return escapeHTML(text).replace(/\n/g,"<br>");
+}
+
+function generateResume(){
+  const name=getValue("name") || "Your Name";
+  const phone=getValue("phone");
+  const email=getValue("email");
+  const address=getValue("address");
+  const objective=getValue("objective");
+  const education=getValue("education");
+  const skills=getValue("skills");
+  const experience=getValue("experience");
+  const additional=getValue("additional");
+
+  document.getElementById("preview").innerHTML=`
+    <div class="resume-name">${escapeHTML(name)}</div>
+
+    <div class="contact">
+      ${escapeHTML(phone)}
+      ${phone && email ? " | " : ""}
+      ${escapeHTML(email)}
+      ${address ? "<br>"+escapeHTML(address) : ""}
+    </div>
+
+    ${objective ? `
+      <h3 class="section-title">CAREER OBJECTIVE</h3>
+      <p>${formatText(objective)}</p>
+    ` : ""}
+
+    ${education ? `
+      <h3 class="section-title">EDUCATION</h3>
+      <p>${formatText(education)}</p>
+    ` : ""}
+
+    ${skills ? `
+      <h3 class="section-title">SKILLS</h3>
+      <p>${formatText(skills)}</p>
+    ` : ""}
+
+    ${experience ? `
+      <h3 class="section-title">WORK EXPERIENCE</h3>
+      <p>${formatText(experience)}</p>
+    ` : ""}
+
+    ${additional ? `
+      <h3 class="section-title">ADDITIONAL DETAILS</h3>
+      <p>${formatText(additional)}</p>
+    ` : ""}
+  `;
+}
+</script>
+
+</body>
+</html>

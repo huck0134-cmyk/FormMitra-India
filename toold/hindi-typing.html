@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hindi Typing Tool - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:700px;margin:25px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+textarea{width:100%;min-height:220px;padding:15px;font-size:18px;border:1px solid #ccc;border-radius:8px;margin:12px 0}
+button{padding:12px;background:#174ea6;color:white;border:0;border-radius:8px;cursor:pointer;margin:5px;font-size:15px}
+.buttons{display:flex;flex-wrap:wrap;justify-content:center}
+#status{text-align:center;margin:10px}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>⌨️ Hindi Typing Tool</h1>
+<p>Type Hindi using English letters (Roman Hindi) and convert it.</p>
+
+<textarea id="inputText" placeholder="Example: mera naam Sanjeev hai. Main Bharat mein rehta hoon."></textarea>
+
+<div class="buttons">
+<button onclick="convertHindi()">Convert to Hindi</button>
+<button onclick="copyText()">Copy Text</button>
+<button onclick="downloadText()">Download TXT</button>
+<button onclick="clearText()">Clear</button>
+</div>
+
+<div id="status"></div>
+
+<h3>Hindi / English Text:</h3>
+<textarea id="outputText" placeholder="Converted Hindi text will appear here..."></textarea>
+
+<div class="buttons">
+<button onclick="copyOutput()">Copy Hindi Text</button>
+</div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+
+</div>
+
+<script>
+async function convertHindi(){
+  const input=document.getElementById("inputText").value.trim();
+  const output=document.getElementById("outputText");
+  const status=document.getElementById("status");
+
+  if(!input){
+    status.textContent="Please enter some text.";
+    return;
+  }
+
+  status.textContent="Converting... Please wait.";
+
+  try{
+    const url="https://inputtools.google.com/request?text="+
+      encodeURIComponent(input)+
+      "&itc=hi-t-i0-und&num=5&cp=0&cs=1&ie=utf-8&oe=utf-8";
+
+    const response=await fetch(url);
+    const data=await response.json();
+
+    if(data[0]==="SUCCESS"){
+      const result=data[1][0][1][0];
+      output.value=result;
+      status.textContent="Hindi conversion successful!";
+    }else{
+      status.textContent="Conversion failed. Please try again.";
+    }
+  }
+  catch(error){
+    status.textContent="Internet connection required. Please try again.";
+  }
+}
+
+function copyText(){
+  const input=document.getElementById("inputText");
+  input.select();
+  document.execCommand("copy");
+  document.getElementById("status").textContent="Text copied!";
+}
+
+function copyOutput(){
+  const output=document.getElementById("outputText");
+  output.select();
+  document.execCommand("copy");
+  document.getElementById("status").textContent="Hindi text copied!";
+}
+
+function downloadText(){
+  const text=document.getElementById("outputText").value ||
+              document.getElementById("inputText").value;
+
+  if(!text){
+    alert("Please enter text first.");
+    return;
+  }
+
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="FormMitra-Hindi-Text.txt";
+  link.click();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function clearText(){
+  document.getElementById("inputText").value="";
+  document.getElementById("outputText").value="";
+  document.getElementById("status").textContent="";
+}
+</script>
+
+</body>
+</html>

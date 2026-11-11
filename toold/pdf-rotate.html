@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Rotate - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
+.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input,select{width:100%;padding:12px;margin:12px 0}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#status{text-align:center;margin-top:15px}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>🔄 PDF Rotate Tool</h1>
+<p>Rotate all pages of your PDF file.</p>
+
+<input type="file" id="pdfFile" accept="application/pdf">
+
+<label>Rotation angle:</label>
+<select id="angle">
+<option value="90">90° Clockwise</option>
+<option value="180">180°</option>
+<option value="270">270° Clockwise</option>
+</select>
+
+<button onclick="rotatePDF()">Rotate & Download PDF</button>
+
+<div id="status"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+async function rotatePDF(){
+  const file=document.getElementById("pdfFile").files[0];
+  const angle=Number(document.getElementById("angle").value);
+  const status=document.getElementById("status");
+
+  if(!file){
+    status.textContent="Please select a PDF file.";
+    return;
+  }
+
+  try{
+    status.textContent="Rotating PDF...";
+
+    const bytes=await file.arrayBuffer();
+    const pdf=await PDFLib.PDFDocument.load(bytes);
+
+    pdf.getPages().forEach(page=>{
+      const current=page.getRotation().angle;
+      page.setRotation(PDFLib.degrees((current+angle)%360));
+    });
+
+    const output=await pdf.save();
+    const blob=new Blob([output],{type:"application/pdf"});
+    const url=URL.createObjectURL(blob);
+
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="FormMitra-Rotated.pdf";
+    link.click();
+
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    status.textContent="✅ PDF rotated successfully!";
+  }
+  catch(error){
+    status.textContent="Error rotating PDF. Please try another file.";
+    console.error(error);
+  }
+}
+</script>
+</body>
+</html>

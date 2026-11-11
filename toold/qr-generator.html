@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Generator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
+.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+textarea{width:100%;padding:12px;margin:12px 0;height:120px;font-size:16px}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#qrBox{text-align:center;margin-top:20px}
+#qrBox img{max-width:100%}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>📱 QR Code Generator</h1>
+<p>Create QR codes for website links, text and contact details.</p>
+
+<textarea id="qrText" placeholder="Enter text or website URL here..."></textarea>
+
+<button onclick="generateQR()">Generate QR Code</button>
+
+<div id="qrBox"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+let qr;
+
+function generateQR(){
+  const text=document.getElementById("qrText").value.trim();
+  const box=document.getElementById("qrBox");
+
+  box.innerHTML="";
+
+  if(!text){
+    box.textContent="Please enter some text or a URL.";
+    return;
+  }
+
+  if(typeof QRCode==="undefined"){
+    box.textContent="QR library could not load. Please check internet.";
+    return;
+  }
+
+  const qrContainer=document.createElement("div");
+  box.appendChild(qrContainer);
+
+  qr=new QRCode(qrContainer,{
+    text:text,
+    width:250,
+    height:250,
+    correctLevel:QRCode.CorrectLevel.H
+  });
+
+  setTimeout(()=>{
+    const canvas=qrContainer.querySelector("canvas");
+    const img=qrContainer.querySelector("img");
+
+    let imageURL;
+
+    if(canvas){
+      imageURL=canvas.toDataURL("image/png");
+    }else if(img && img.src){
+      imageURL=img.src;
+    }
+
+    if(imageURL){
+      const link=document.createElement("a");
+      link.href=imageURL;
+      link.download="FormMitra-QR-Code.png";
+      link.textContent="Download QR Code";
+      link.style.display="block";
+      link.style.marginTop="15px";
+      link.style.padding="12px";
+      link.style.background="#16803c";
+      link.style.color="white";
+      link.style.textDecoration="none";
+      link.style.borderRadius="8px";
+
+      box.appendChild(link);
+    }
+  },500);
+}
+</script>
+
+</body>
+</html>

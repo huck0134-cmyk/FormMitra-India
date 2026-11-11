@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Text Extractor - FormMitra India</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+body{font-family:Arial;background:#f1f5f9;margin:0;padding:20px}
+.container{max-width:700px;margin:20px auto;background:white;padding:25px;border-radius:12px}
+h1{text-align:center;color:#075985}
+input,button,textarea{width:100%;padding:12px;margin:10px 0;box-sizing:border-box}
+textarea{height:300px}
+button{background:#0284c7;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+#status{text-align:center;font-weight:bold}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>PDF Text Extractor</h1>
+<p>PDF upload karke uska text extract karein.</p>
+
+<input type="file" id="pdfFile" accept="application/pdf">
+
+<button onclick="extractText()">Extract Text</button>
+
+<textarea id="output" placeholder="Extracted text yahan aayega..."></textarea>
+
+<button onclick="copyText()">Copy Text</button>
+<button onclick="downloadText()">Download TXT File</button>
+
+<p id="status"></p>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function extractText(){
+
+const file=document.getElementById("pdfFile").files[0];
+const output=document.getElementById("output");
+const status=document.getElementById("status");
+
+if(!file){
+status.textContent="Please upload a PDF.";
+return;
+}
+
+try{
+
+status.textContent="Extracting text...";
+output.value="";
+
+const bytes=await file.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data:bytes}).promise;
+
+let fullText="";
+
+for(let i=1;i<=pdf.numPages;i++){
+
+const page=await pdf.getPage(i);
+const content=await page.getTextContent();
+
+const pageText=content.items
+.map(item=>item.str)
+.join(" ");
+
+fullText+=`--- Page ${i} ---\n${pageText}\n\n`;
+}
+
+output.value=fullText;
+status.textContent="Text extracted successfully!";
+
+}catch(error){
+console.error(error);
+status.textContent="PDF read nahi ho paayi.";
+}
+}
+
+function copyText(){
+
+const output=document.getElementById("output");
+
+if(!output.value){
+document.getElementById("status").textContent="Extract text first.";
+return;
+}
+
+output.select();
+document.execCommand("copy");
+
+document.getElementById("status").textContent="Text copied!";
+}
+
+function downloadText(){
+
+const text=document.getElementById("output").value;
+
+if(!text){
+document.getElementById("status").textContent="Extract text first.";
+return;
+}
+
+const blob=new Blob([text],{type:"text/plain"});
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+a.href=url;
+a.download="FormMitra-Extracted-Text.txt";
+a.click();
+
+URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
