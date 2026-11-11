@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passport Photo Maker | FormMitra India</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7fc;
+  color: #172033;
+}
+
+header {
+  background: #ffffff;
+  padding: 18px 6%;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: bold;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #2563eb;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 35px auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 25px;
+}
+
+.panel {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+}
+
+label {
+  display: block;
+  margin: 15px 0 7px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d6deea;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 13px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 18px;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.download {
+  background: #16a34a;
+}
+
+.download:hover {
+  background: #15803d;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.preview {
+  text-align: center;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.preview img {
+  max-width: 100%;
+  max-height: 400px;
+  display: none;
+  margin: 15px auto;
+  border: 1px solid #ddd;
+}
+
+.note {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+#message {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #15803d;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media(max-width:700px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">FormMitra <span>India</span></div>
+  <a href="../index.html">← Back to Home</a>
+</header>
+
+<div class="container">
+
+  <h1>Passport Photo Maker</h1>
+
+  <p class="subtitle">
+    Create passport-size photos and signatures for online applications.
+  </p>
+
+  <div class="panel">
+
+    <div class="layout">
+
+      <div>
+
+        <label>Select Photo</label>
+
+        <input type="file" id="photoInput" accept="image/*">
+
+        <label>Photo Size</label>
+
+        <select id="photoSize">
+          <option value="413,531">Passport Photo — 35 × 45 mm</option>
+          <option value="600,600">Square Photo — 2 × 2 inch</option>
+          <option value="300,300">Square Photo — 300 × 300 px</option>
+          <option value="custom">Custom Size</option>
+        </select>
+
+        <div id="customSize" style="display:none">
+
+          <label>Width (pixels)</label>
+          <input type="number" id="customWidth" value="413">
+
+          <label>Height (pixels)</label>
+          <input type="number" id="customHeight" value="531">
+
+        </div>
+
+        <label>Background Color</label>
+
+        <select id="backgroundColor">
+          <option value="white">White</option>
+          <option value="#f0f0f0">Light Gray</option>
+          <option value="#dbeafe">Light Blue</option>
+          <option value="original">Original Background</option>
+        </select>
+
+        <label>Image Format</label>
+
+        <select id="imageFormat">
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+        </select>
+
+        <button id="createBtn">Create Passport Photo</button>
+
+        <button id="downloadBtn" class="download" style="display:none">
+          Download Photo
+        </button>
+
+        <p id="message"></p>
+
+      </div>
+
+      <div class="preview">
+
+        <h3>Photo Preview</h3>
+
+        <img id="previewImage" alt="Passport photo preview">
+
+        <p id="previewText">
+          Upload a photo to get started.
+        </p>
+
+      </div>
+
+    </div>
+
+    <p class="note">
+      Note: This tool resizes and center-crops your image.
+      It does not automatically adjust face position or remove the original
+      background. Always check the photo specifications of the application
+      before submitting.
+    </p>
+
+  </div>
+
+</div>
+
+<footer>
+  © FormMitra India — Free Online Tools
+</footer>
+
+<script>
+
+const photoInput = document.getElementById("photoInput");
+const photoSize = document.getElementById("photoSize");
+const customSize = document.getElementById("customSize");
+const createBtn = document.getElementById("createBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const previewImage = document.getElementById("previewImage");
+const previewText = document.getElementById("previewText");
+const message = document.getElementById("message");
+
+let uploadedImage = null;
+let finalImageURL = null;
+
+photoSize.addEventListener("change", function() {
+  customSize.style.display =
+    this.value === "custom" ? "block" : "none";
+});
+
+photoInput.addEventListener("change", function() {
+
+  const file = this.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    message.textContent = "Please select a valid image.";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+
+    const img = new Image();
+
+    img.onload = function() {
+
+      uploadedImage = img;
+
+      previewImage.src = event.target.result;
+      previewImage.style.display = "block";
+
+      previewText.textContent =
+        "Original photo: " + img.width + " × " + img.height + " pixels";
+
+      message.textContent = "Photo uploaded successfully.";
+
+    };
+
+    img.src = event.target.result;
+
+  };
+
+  reader.readAsDataURL(file);
+
+});
+
+createBtn.addEventListener("click", function() {
+
+  if (!uploadedImage) {
+    message.textContent = "Please upload a photo first.";
+    return;
+  }
+
+  let width;
+  let height;
+
+  if (photoSize.value === "custom") {
+
+    width = Number(document.getElementById("customWidth").value);
+    height = Number(document.getElementById("customHeight").value);
+
+  } else {
+
+    const dimensions = photoSize.value.split(",");
+
+    width = Number(dimensions[0]);
+    height = Number(dimensions[1]);
+
+  }
+
+  if (
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    width < 1 ||
+    height < 1 ||
+    width > 5000 ||
+    height > 5000
+  ) {
+
+    message.textContent = "Enter valid dimensions (1–5000 pixels).";
+    return;
+
+  }
+
+  const canvas = document.createElement("canvas");
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+
+  const background = document.getElementById("backgroundColor").value;
+
+  if (background !== "original") {
+
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, width, height);
+
+  }
+
+  const sourceWidth = uploadedImage.width;
+  const sourceHeight = uploadedImage.height;
+
+  const sourceRatio = sourceWidth / sourceHeight;
+  const targetRatio = width / height;
+
+  let cropWidth;
+  let cropHeight;
+  let cropX;
+  let cropY;
+
+  if (sourceRatio > targetRatio) {
+
+    cropHeight = sourceHeight;
+    cropWidth = sourceHeight * targetRatio;
+    cropX = (sourceWidth - cropWidth) / 2;
+    cropY = 0;
+
+  } else {
+
+    cropWidth = sourceWidth;
+    cropHeight = sourceWidth / targetRatio;
+    cropX = 0;
+    cropY = (sourceHeight - cropHeight) / 2;
+
+  }
+
+  ctx.drawImage(
+    uploadedImage,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    width,
+    height
+  );
+
+  const format = document.getElementById("imageFormat").value;
+
+  canvas.toBlob(function(blob) {
+
+    if (!blob) {
+      message.textContent = "Photo processing failed.";
+      return;
+    }
+
+    if (finalImageURL) {
+      URL.revokeObjectURL(finalImageURL);
+    }
+
+    finalImageURL = URL.createObjectURL(blob);
+
+    previewImage.src = finalImageURL;
+    previewImage.style.display = "block";
+
+    previewText.textContent =
+      "Created: " + width + " × " + height + " pixels";
+
+    downloadBtn.style.display = "inline-block";
+
+    message.textContent = "Passport photo created successfully!";
+
+  }, format, 0.95);
+
+});
+
+downloadBtn.addEventListener("click", function() {
+
+  if (!finalImageURL) return;
+
+  const format = document.getElementById("imageFormat").value;
+
+  const extension = format === "image/png" ? "png" : "jpg";
+
+  const link = document.createElement("a");
+
+  link.href = finalImageURL;
+  link.download = "FormMitra-Passport-Photo." + extension;
+
+  link.click();
+
+});
+
+</script>
+
+</body>
+</html>

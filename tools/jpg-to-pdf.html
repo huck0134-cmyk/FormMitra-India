@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPG to PDF - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
+.container{max-width:650px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input{width:100%;padding:12px;margin:12px 0}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#status{text-align:center;margin-top:15px}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>🖼️ JPG to PDF Converter</h1>
+<p>Convert multiple JPG, PNG photos into one PDF.</p>
+
+<input type="file" id="images" accept="image/*" multiple>
+
+<button onclick="convertPDF()">Convert Images to PDF</button>
+
+<div id="status"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+async function convertPDF(){
+  const files=document.getElementById("images").files;
+  const status=document.getElementById("status");
+
+  if(files.length===0){
+    status.textContent="Please select images first.";
+    return;
+  }
+
+  try{
+    status.textContent="Creating PDF...";
+
+    const pdf=await PDFLib.PDFDocument.create();
+
+    for(const file of files){
+      const bytes=await file.arrayBuffer();
+      let image;
+
+      if(file.type==="image/jpeg" || file.type==="image/jpg"){
+        image=await pdf.embedJpg(bytes);
+      }else if(file.type==="image/png"){
+        image=await pdf.embedPng(bytes);
+      }else{
+        const bitmap=await createImageBitmap(file);
+        const canvas=document.createElement("canvas");
+        canvas.width=bitmap.width;
+        canvas.height=bitmap.height;
+
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(bitmap,0,0);
+
+        const data=canvas.toDataURL("image/jpeg",0.95);
+        const base64=data.split(",")[1];
+        const binary=atob(base64);
+        const array=new Uint8Array(binary.length);
+
+        for(let i=0;i<binary.length;i++){
+          array[i]=binary.charCodeAt(i);
+        }
+
+        image=await pdf.embedJpg(array);
+      }
+
+      const page=pdf.addPage([image.width,image.height]);
+
+      page.drawImage(image,{
+        x:0,
+        y:0,
+        width:image.width,
+        height:image.height
+      });
+    }
+
+    const output=await pdf.save();
+    const blob=new Blob([output],{type:"application/pdf"});
+    const url=URL.createObjectURL(blob);
+
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="FormMitra-Images.pdf";
+    link.click();
+
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+    status.textContent="✅ Images converted into PDF!";
+  }
+  catch(error){
+    console.error(error);
+    status.textContent="Conversion failed. Please try another image.";
+  }
+}
+</script>
+</body>
+</html>

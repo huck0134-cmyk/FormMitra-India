@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eligibility Calculator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:650px;margin:25px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:15px}
+#result{margin-top:20px;padding:15px;border-radius:8px;text-align:center;font-weight:bold}
+.back{display:block;text-align:center;margin-top:20px}
+.note{font-size:13px;color:#666}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🎓 Eligibility Calculator</h1>
+<p>Check basic age and qualification eligibility.</p>
+
+<label>Date of Birth:</label>
+<input type="date" id="dob">
+
+<label>Eligibility Check Date:</label>
+<input type="date" id="checkDate">
+
+<label>Minimum Age:</label>
+<input type="number" id="minAge" value="18" min="0">
+
+<label>Maximum Age:</label>
+<input type="number" id="maxAge" value="27" min="0">
+
+<label>Required Qualification:</label>
+<select id="requiredQualification">
+<option value="10">10th Pass</option>
+<option value="12">12th Pass</option>
+<option value="graduate">Graduate</option>
+<option value="any">Any Qualification</option>
+</select>
+
+<label>Your Qualification:</label>
+<select id="yourQualification">
+<option value="10">10th Pass</option>
+<option value="12">12th Pass</option>
+<option value="graduate">Graduate</option>
+</select>
+
+<label>Age Relaxation (Years):</label>
+<input type="number" id="relaxation" value="0" min="0">
+
+<button onclick="checkEligibility()">Check Eligibility</button>
+
+<div id="result"></div>
+
+<p class="note">
+This calculator provides a basic estimate only. Always check the official recruitment notification for age cutoff dates, category relaxation and qualification rules.
+</p>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+
+</div>
+
+<script>
+function calculateAge(dob,checkDate){
+  let age=checkDate.getFullYear()-dob.getFullYear();
+
+  const monthDifference=checkDate.getMonth()-dob.getMonth();
+
+  if(monthDifference<0 ||
+    (monthDifference===0 && checkDate.getDate()<dob.getDate())){
+    age--;
+  }
+
+  return age;
+}
+
+function checkEligibility(){
+  const dobValue=document.getElementById("dob").value;
+  const checkDateValue=document.getElementById("checkDate").value;
+
+  const minAge=Number(document.getElementById("minAge").value);
+  const maxAge=Number(document.getElementById("maxAge").value);
+  const relaxation=Number(document.getElementById("relaxation").value);
+
+  const required=document.getElementById("requiredQualification").value;
+  const qualification=document.getElementById("yourQualification").value;
+
+  const result=document.getElementById("result");
+
+  if(!dobValue || !checkDateValue){
+    result.textContent="Please select Date of Birth and Check Date.";
+    result.style.background="#fff3cd";
+    return;
+  }
+
+  if(minAge<0 || maxAge<minAge || relaxation<0){
+    result.textContent="Please enter valid age limits and relaxation.";
+    result.style.background="#fff3cd";
+    return;
+  }
+
+  const dob=new Date(dobValue+"T00:00:00");
+  const checkDate=new Date(checkDateValue+"T00:00:00");
+
+  if(dob>checkDate){
+    result.textContent="Date of Birth cannot be after the check date.";
+    result.style.background="#fff3cd";
+    return;
+  }
+
+  const age=calculateAge(dob,checkDate);
+  const maxAllowedAge=maxAge+relaxation;
+
+  const qualificationLevels={
+    "10":1,
+    "12":2,
+    "graduate":3
+  };
+
+  const ageEligible=age>=minAge && age<=maxAllowedAge;
+
+  const qualificationEligible=
+    required==="any" ||
+    qualificationLevels[qualification]>=qualificationLevels[required];
+
+  if(ageEligible && qualificationEligible){
+    result.innerHTML=
+      "✅ Basic Eligibility: You appear to be eligible.<br>"+
+      "Your Age: "+age+" years";
+    result.style.background="#d4edda";
+    result.style.color="#155724";
+  }else{
+    result.innerHTML=
+      "❌ Basic Eligibility: You do not meet the entered criteria.<br>"+
+      "Your Age: "+age+" years";
+    result.style.background="#f8d7da";
+    result.style.color="#721c24";
+  }
+}
+
+const today=new Date();
+document.getElementById("checkDate").value=
+  today.getFullYear()+"-"+
+  String(today.getMonth()+1).padStart(2,"0")+"-"+
+  String(today.getDate()).padStart(2,"0");
+</script>
+
+</body>
+</html>

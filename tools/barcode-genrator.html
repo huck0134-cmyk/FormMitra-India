@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barcode Generator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
+.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input,select{width:100%;padding:12px;margin:12px 0}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+#barcodeBox{text-align:center;margin-top:25px;overflow-x:auto}
+#barcode{max-width:100%}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>🏷️ Barcode Generator</h1>
+<p>Create and download product barcodes.</p>
+
+<input id="barcodeText" placeholder="Enter product number (e.g. 123456789012)">
+
+<label>Barcode Format:</label>
+<select id="barcodeFormat">
+<option value="CODE128">CODE 128 (General text/numbers)</option>
+<option value="EAN13">EAN-13 (12 or 13 digits)</option>
+<option value="UPC">UPC (12 digits)</option>
+</select>
+
+<button onclick="generateBarcode()">Generate Barcode</button>
+
+<div id="barcodeBox">
+<svg id="barcode"></svg>
+</div>
+
+<button onclick="downloadBarcode()">Download Barcode PNG</button>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
+
+<script>
+function generateBarcode(){
+  const value=document.getElementById("barcodeText").value.trim();
+  const format=document.getElementById("barcodeFormat").value;
+  const barcode=document.getElementById("barcode");
+  
+  if(!value){
+    alert("Please enter barcode text or number.");
+    return;
+  }
+
+  try{
+    JsBarcode("#barcode",value,{
+      format:format,
+      width:2,
+      height:100,
+      displayValue:true,
+      margin:10,
+      background:"#ffffff",
+      lineColor:"#000000"
+    });
+  }
+  catch(error){
+    alert("Invalid barcode value. Please check the format and number.");
+  }
+}
+
+function downloadBarcode(){
+  const svg=document.getElementById("barcode");
+
+  if(!svg.querySelector("rect") && !svg.querySelector("path")){
+    alert("Please generate a barcode first.");
+    return;
+  }
+
+  const svgData=new XMLSerializer().serializeToString(svg);
+  const canvas=document.createElement("canvas");
+  const context=canvas.getContext("2d");
+  const image=new Image();
+
+  const blob=new Blob([svgData],{type:"image/svg+xml;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+
+  image.onload=function(){
+    canvas.width=image.width*2;
+    canvas.height=image.height*2;
+
+    context.fillStyle="#ffffff";
+    context.fillRect(0,0,canvas.width,canvas.height);
+    context.drawImage(image,0,0,canvas.width,canvas.height);
+
+    const link=document.createElement("a");
+    link.download="FormMitra-Barcode.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+
+    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(blob);
+  };
+
+  image.src=url;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letter Writer - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:700px;margin:25px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+label{display:block;font-weight:bold;margin-top:12px}
+input,select,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px;font-size:15px}
+textarea{min-height:100px}
+button{padding:13px;background:#174ea6;color:white;border:0;border-radius:8px;cursor:pointer;margin:6px;font-size:15px}
+.buttons{display:flex;flex-wrap:wrap;justify-content:center}
+#letterOutput{min-height:300px;background:#fffdf8}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>✍️ Letter Writer</h1>
+<p>Create application letters, office requests and complaint letters.</p>
+
+<label>Letter Type:</label>
+<select id="letterType">
+<option value="leave">Leave Application</option>
+<option value="job">Job Application</option>
+<option value="complaint">Complaint Letter</option>
+<option value="office">Office Request</option>
+<option value="passport">Passport / Verification Request</option>
+<option value="general">General Application</option>
+</select>
+
+<label>Language:</label>
+<select id="language">
+<option value="english">English</option>
+<option value="hindi">Hindi</option>
+</select>
+
+<label>Your Name:</label>
+<input id="sender" placeholder="Enter your name">
+
+<label>Recipient / To:</label>
+<input id="recipient" placeholder="Manager, HR, Principal, Officer...">
+
+<label>Subject:</label>
+<input id="subject" placeholder="Enter letter subject">
+
+<label>Reason / Details:</label>
+<textarea id="details" placeholder="Explain your reason here..."></textarea>
+
+<label>Date (optional):</label>
+<input type="date" id="letterDate">
+
+<div class="buttons">
+<button onclick="generateLetter()">Generate Letter</button>
+<button onclick="copyLetter()">Copy Letter</button>
+<button onclick="downloadLetter()">Download TXT</button>
+<button onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<textarea id="letterOutput" placeholder="Your letter will appear here..."></textarea>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script>
+function generateLetter(){
+  const type=document.getElementById("letterType").value;
+  const lang=document.getElementById("language").value;
+  const name=document.getElementById("sender").value.trim() || "Your Name";
+  const recipient=document.getElementById("recipient").value.trim() || "The Concerned Officer";
+  const subject=document.getElementById("subject").value.trim() || "Application";
+  const details=document.getElementById("details").value.trim() || "I request you to kindly consider my application.";
+  const date=document.getElementById("letterDate").value;
+
+  let letter="";
+
+  if(lang==="english"){
+    const openings={
+      leave:"I respectfully request leave for the required period.",
+      job:"I am writing to apply for the position and would appreciate your consideration.",
+      complaint:"I would like to bring the following issue to your kind attention.",
+      office:"I respectfully request your assistance regarding the following matter.",
+      passport:"I respectfully request your assistance with my passport verification.",
+      general:"I respectfully submit this application for your consideration."
+    };
+
+    letter=
+`Date: ${date || "________________"}
+
+To,
+${recipient}
+
+Subject: ${subject}
+
+Respected Sir/Madam,
+
+${openings[type]}
+
+${details}
+
+I kindly request you to consider my request and take the necessary action.
+
+Thank you.
+
+Yours faithfully,
+${name}`;
+  }else{
+    const openings={
+      leave:"सविनय निवेदन है कि मुझे आवश्यक अवधि के लिए अवकाश प्रदान किया जाए।",
+      job:"मैं आपके संस्थान में नौकरी के लिए आवेदन करना चाहता/चाहती हूँ।",
+      complaint:"मैं आपका ध्यान निम्नलिखित समस्या की ओर आकर्षित करना चाहता/चाहती हूँ।",
+      office:"सविनय निवेदन है कि कृपया निम्नलिखित विषय में मेरी सहायता करें।",
+      passport:"सविनय निवेदन है कि कृपया मेरे पासपोर्ट सत्यापन में सहायता करें।",
+      general:"सविनय निवेदन है कि कृपया मेरे आवेदन पर विचार करें।"
+    };
+
+    letter=
+`दिनांक: ${date || "________________"}
+
+सेवा में,
+${recipient}
+
+विषय: ${subject}
+
+महोदय/महोदया,
+
+${openings[type]}
+
+${details}
+
+अतः आपसे विनम्र निवेदन है कि कृपया मेरे अनुरोध पर विचार करके आवश्यक कार्यवाही करें।
+
+धन्यवाद।
+
+भवदीय,
+${name}`;
+  }
+
+  document.getElementById("letterOutput").value=letter;
+}
+
+async function copyLetter(){
+  const output=document.getElementById("letterOutput");
+
+  if(!output.value){
+    alert("Please generate a letter first.");
+    return;
+  }
+
+  try{
+    await navigator.clipboard.writeText(output.value);
+    alert("Letter copied!");
+  }catch(error){
+    output.select();
+    document.execCommand("copy");
+    alert("Letter copied!");
+  }
+}
+
+function downloadLetter(){
+  const text=document.getElementById("letterOutput").value;
+
+  if(!text){
+    alert("Please generate a letter first.");
+    return;
+  }
+
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="FormMitra-Letter.txt";
+  link.click();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+</script>
+
+</body>
+</html>

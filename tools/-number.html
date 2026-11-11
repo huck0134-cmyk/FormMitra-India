@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Page Number - FormMitra India</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<style>
+body{font-family:Arial;background:#f1f5f9;margin:0;padding:20px}
+.container{max-width:600px;margin:20px auto;background:white;padding:25px;border-radius:12px}
+h1{text-align:center;color:#075985}
+input,select,button{width:100%;padding:12px;margin:10px 0;box-sizing:border-box}
+button{background:#0284c7;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+#status{text-align:center;font-weight:bold}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>PDF Page Number Tool</h1>
+<p>PDF upload karein aur har page par page number add karein.</p>
+
+<input type="file" id="pdfFile" accept="application/pdf">
+
+<label>Starting Page Number:</label>
+<input type="number" id="startNumber" value="1" min="1">
+
+<label>Number Position:</label>
+<select id="position">
+<option value="bottom-center">Bottom Center</option>
+<option value="bottom-left">Bottom Left</option>
+<option value="bottom-right">Bottom Right</option>
+<option value="top-center">Top Center</option>
+</select>
+
+<button onclick="addNumbers()">Add Page Numbers & Download</button>
+<p id="status"></p>
+</div>
+
+<script>
+async function addNumbers(){
+const file=document.getElementById("pdfFile").files[0];
+const status=document.getElementById("status");
+const start=parseInt(document.getElementById("startNumber").value)||1;
+const position=document.getElementById("position").value;
+
+if(!file){
+status.textContent="Please upload a PDF.";
+return;
+}
+
+if(!window.PDFLib){
+status.textContent="PDF library load nahi hui. Internet check karein.";
+return;
+}
+
+try{
+status.textContent="Processing PDF...";
+
+const {PDFDocument, rgb, StandardFonts}=PDFLib;
+const pdf=await PDFDocument.load(await file.arrayBuffer());
+const font=await pdf.embedFont(StandardFonts.Helvetica);
+const pages=pdf.getPages();
+
+pages.forEach((page,index)=>{
+const {width,height}=page.getSize();
+const text=String(start+index);
+const fontSize=12;
+const textWidth=font.widthOfTextAtSize(text,fontSize);
+
+let x=(width-textWidth)/2;
+let y=20;
+
+if(position==="bottom-left") x=20;
+if(position==="bottom-right") x=width-textWidth-20;
+if(position==="top-center") y=height-30;
+
+page.drawText(text,{
+x:x,
+y:y,
+size:fontSize,
+font:font,
+color:rgb(0,0,0)
+});
+});
+
+const bytes=await pdf.save();
+const blob=new Blob([bytes],{type:"application/pdf"});
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+
+a.href=url;
+a.download="FormMitra-Page-Numbered.pdf";
+a.click();
+
+URL.revokeObjectURL(url);
+status.textContent="Success! Numbered PDF downloaded.";
+
+}catch(error){
+console.error(error);
+status.textContent="PDF process nahi hui. Valid PDF upload karein.";
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Split - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px;color:#222}
+.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
+h1{text-align:center;color:#174ea6}
+p{text-align:center;color:#555}
+input{width:100%;padding:12px;margin:12px 0}
+button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
+button:hover{background:#0d3677}
+#status{text-align:center;margin-top:15px}
+.back{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>✂️ PDF Split Tool</h1>
+<p>Extract selected pages from a PDF file.</p>
+
+<input type="file" id="pdfFile" accept="application/pdf">
+
+<label><b>Page numbers</b></label>
+<input type="text" id="pages" placeholder="Example: 1,3,5-7">
+
+<p>Example: 1,3,5-7 means pages 1, 3, 5, 6 and 7.</p>
+
+<button onclick="splitPDF()">Split & Download PDF</button>
+
+<div id="status"></div>
+
+<a class="back" href="../index.html">← Back to FormMitra India</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+async function splitPDF(){
+  const file=document.getElementById("pdfFile").files[0];
+  const pageInput=document.getElementById("pages").value.trim();
+  const status=document.getElementById("status");
+
+  if(!file){
+    status.textContent="Please select a PDF file.";
+    return;
+  }
+
+  if(!pageInput){
+    status.textContent="Please enter page numbers.";
+    return;
+  }
+
+  try{
+    status.textContent="Processing PDF...";
+
+    const bytes=await file.arrayBuffer();
+    const sourcePDF=await PDFLib.PDFDocument.load(bytes);
+    const totalPages=sourcePDF.getPageCount();
+
+    const selectedPages=new Set();
+
+    const parts=pageInput.split(",");
+
+    for(const part of parts){
+      const range=part.trim();
+
+      if(range.includes("-")){
+        const numbers=range.split("-").map(Number);
+
+        if(numbers.length!==2 ||
+           !Number.isInteger(numbers[0]) ||
+           !Number.isInteger(numbers[1]) ||
+           numbers[0]<1 ||
+           numbers[1]<numbers[0] ||
+           numbers[1]>totalPages){
+          throw new Error("Invalid page range.");
+        }
+
+        for(let i=numbers[0];i<=numbers[1];i++){
+          selectedPages.add(i);
+        }
+      }else{
+        const page=Number(range);
+
+        if(!Number.isInteger(page)||page<1||page>totalPages){
+          throw new Error("Invalid page number.");
+        }
+
+        selectedPages.add(page);
+      }
+    }
+
+    const pages=[...selectedPages].sort((a,b)=>a-b);
+
+    if(pages.length===0){
+      throw new Error("No pages selected.");
+    }
+
+    const newPDF=await PDFLib.PDFDocument.create();
+
+    const copiedPages=await newPDF.copyPages(
+      sourcePDF,
+      pages.map(page=>page-1)
+    );
+
+    copiedPages.forEach(page=>newPDF.addPage(page));
+
+    const output=await newPDF.save();
+    const blob=new Blob([output],{type:"application/pdf"});
+    const url=URL.createObjectURL(blob);
+
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="FormMitra-Split.pdf";
+    link.click();
+
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+    status.textContent="✅ Selected pages downloaded successfully!";
+  }
+  catch(error){
+    status.textContent="Error: "+error.message+
+      " Please check your page numbers.";
+  }
+}
+</script>
+</body>
+</html>
