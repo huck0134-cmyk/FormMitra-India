@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMI Calculator - FormMitra India</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f6fb;
+  margin: 0;
+  padding: 20px;
+  color: #222;
+}
+
+.container {
+  max-width: 600px;
+  margin: 25px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px #0001;
+}
+
+h1 {
+  text-align: center;
+  color: #174ea6;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  background: #174ea6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #103875;
+}
+
+.result {
+  display: none;
+  margin-top: 25px;
+  padding: 20px;
+  background: #f0f5ff;
+  border-radius: 12px;
+}
+
+.emi-box {
+  text-align: center;
+  padding: 18px;
+  background: #174ea6;
+  color: white;
+  border-radius: 10px;
+}
+
+.emi-box h2 {
+  font-size: 30px;
+  margin: 10px 0;
+}
+
+.detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #174ea6;
+  text-decoration: none;
+}
+
+.note {
+  font-size: 12px;
+  color: #777;
+  line-height: 1.5;
+  margin-top: 18px;
+}
+
+@media(max-width:480px) {
+  .container {
+    padding: 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💰 EMI Calculator</h1>
+
+<p class="subtitle">
+Calculate your monthly loan EMI instantly for free.
+</p>
+
+<label>Loan Amount (₹)</label>
+<input type="number" id="amount" placeholder="Example: 500000" min="1">
+
+<label>Annual Interest Rate (%)</label>
+<input type="number" id="rate" placeholder="Example: 10.5" min="0" step="any">
+
+<label>Loan Duration</label>
+<input type="number" id="duration" placeholder="Example: 5" min="1">
+
+<label>Duration Type</label>
+<select id="durationType">
+<option value="years">Years</option>
+<option value="months">Months</option>
+</select>
+
+<button onclick="calculateEMI()">Calculate EMI</button>
+
+<div class="result" id="result">
+
+<div class="emi-box">
+<p>Your Monthly EMI</p>
+<h2 id="emi">₹0</h2>
+</div>
+
+<div class="detail">
+<strong>Loan Amount</strong>
+<span id="loan">₹0</span>
+</div>
+
+<div class="detail">
+<strong>Total Interest</strong>
+<span id="interest">₹0</span>
+</div>
+
+<div class="detail">
+<strong>Total Payment</strong>
+<span id="total">₹0</span>
+</div>
+
+<div class="detail">
+<strong>Loan Duration</strong>
+<span id="period">0 Months</span>
+</div>
+
+<button onclick="downloadResult()">
+Download EMI Report
+</button>
+
+</div>
+
+<p class="note">
+Note: This calculator provides an estimated EMI using the standard reducing-balance formula. Actual bank EMI may differ due to fees, insurance, and lender-specific terms.
+</p>
+
+<a class="back" href="../index.html">
+← Back to FormMitra India
+</a>
+
+</div>
+
+<script>
+
+let reportData = "";
+
+function formatMoney(value) {
+  return "₹" + value.toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
+}
+
+function calculateEMI() {
+
+  const principal = Number(document.getElementById("amount").value);
+  const annualRate = Number(document.getElementById("rate").value);
+  const duration = Number(document.getElementById("duration").value);
+  const type = document.getElementById("durationType").value;
+
+  if (!Number.isFinite(principal) || principal <= 0 ||
+      !Number.isFinite(annualRate) || annualRate < 0 ||
+      !Number.isFinite(duration) || duration <= 0) {
+    alert("Please enter valid loan details.");
+    return;
+  }
+
+  if (principal > 1000000000000 || annualRate > 1000 || duration > 1200) {
+    alert("Please enter realistic loan details.");
+    return;
+  }
+
+  let months = type === "years"
+    ? duration * 12
+    : duration;
+
+  if (!Number.isInteger(months) || months > 1200) {
+    alert("Loan duration must be a whole number of months (maximum 1200).");
+    return;
+  }
+
+  const monthlyRate = annualRate / 12 / 100;
+
+  let emi;
+
+  if (monthlyRate === 0) {
+    emi = principal / months;
+  } else {
+    const power = Math.pow(1 + monthlyRate, months);
+
+    emi = principal * monthlyRate * power / (power - 1);
+  }
+
+  const totalPayment = emi * months;
+  const totalInterest = totalPayment - principal;
+
+  document.getElementById("emi").innerText =
+    formatMoney(emi);
+
+  document.getElementById("loan").innerText =
+    formatMoney(principal);
+
+  document.getElementById("interest").innerText =
+    formatMoney(totalInterest);
+
+  document.getElementById("total").innerText =
+    formatMoney(totalPayment);
+
+  document.getElementById("period").innerText =
+    months + " Months";
+
+  document.getElementById("result").style.display = "block";
+
+  reportData =
+    "FORMMITRA INDIA - EMI REPORT\n\n" +
+    "Loan Amount: " + formatMoney(principal) + "\n" +
+    "Annual Interest Rate: " + annualRate + "%\n" +
+    "Loan Duration: " + months + " Months\n" +
+    "Monthly EMI: " + formatMoney(emi) + "\n" +
+    "Total Interest: " + formatMoney(totalInterest) + "\n" +
+    "Total Payment: " + formatMoney(totalPayment) + "\n\n" +
+    "Estimated EMI calculation.";
+}
+
+function downloadResult() {
+
+  if (!reportData) {
+    alert("Please calculate EMI first.");
+    return;
+  }
+
+  const blob = new Blob([reportData], {
+    type: "text/plain;charset=utf-8"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "FormMitra-EMI-Report.txt";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+</script>
+
+</body>
+</html>

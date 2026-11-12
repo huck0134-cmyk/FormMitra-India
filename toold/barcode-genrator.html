@@ -1,113 +1,294 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Barcode Generator - FormMitra India</title>
 
 <style>
-*{box-sizing:border-box}
-body{font-family:Arial;background:#f3f6fb;margin:0;padding:20px}
-.container{max-width:600px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 4px 20px #0001}
-h1{text-align:center;color:#174ea6}
-p{text-align:center;color:#555}
-input,select{width:100%;padding:12px;margin:12px 0}
-button{width:100%;padding:14px;background:#174ea6;color:white;border:0;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px}
-#barcodeBox{text-align:center;margin-top:25px;overflow-x:auto}
-#barcode{max-width:100%}
-.back{display:block;text-align:center;margin-top:20px}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f6fb;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px #0001;
+}
+
+h1 {
+  text-align: center;
+  color: #174ea6;
+}
+
+p {
+  text-align: center;
+  color: #555;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: #174ea6;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+button:hover {
+  background: #103875;
+}
+
+#barcodeBox {
+  text-align: center;
+  margin-top: 25px;
+  padding: 15px;
+  overflow-x: auto;
+  background: white;
+}
+
+#barcode {
+  max-width: 100%;
+  height: auto;
+}
+
+#message {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #174ea6;
+  text-decoration: none;
+}
 </style>
 </head>
 
 <body>
-<div class="container">
-<h1>🏷️ Barcode Generator</h1>
-<p>Create and download product barcodes.</p>
 
-<input id="barcodeText" placeholder="Enter product number (e.g. 123456789012)">
+<div class="container">
+
+<h1>🏷️ Barcode Generator</h1>
+
+<p>Create and download product barcodes for free.</p>
+
+<input
+  type="text"
+  id="barcodeText"
+  placeholder="Enter barcode number or text"
+>
 
 <label>Barcode Format:</label>
+
 <select id="barcodeFormat">
-<option value="CODE128">CODE 128 (General text/numbers)</option>
-<option value="EAN13">EAN-13 (12 or 13 digits)</option>
-<option value="UPC">UPC (12 digits)</option>
+  <option value="CODE128">CODE 128</option>
+  <option value="EAN13">EAN-13</option>
+  <option value="UPC">UPC-A</option>
 </select>
 
-<button onclick="generateBarcode()">Generate Barcode</button>
+<button onclick="generateBarcode()">
+  Generate Barcode
+</button>
 
 <div id="barcodeBox">
-<svg id="barcode"></svg>
+  <svg id="barcode"></svg>
 </div>
 
-<button onclick="downloadBarcode()">Download Barcode PNG</button>
+<p id="message"></p>
 
-<a class="back" href="../index.html">← Back to FormMitra India</a>
+<button onclick="downloadBarcode()">
+  Download Barcode PNG
+</button>
+
+<a class="back" href="../index.html">
+  ← Back to FormMitra India
+</a>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
 
 <script>
-function generateBarcode(){
-  const value=document.getElementById("barcodeText").value.trim();
-  const format=document.getElementById("barcodeFormat").value;
-  const barcode=document.getElementById("barcode");
-  
-  if(!value){
-    alert("Please enter barcode text or number.");
+
+let barcodeGenerated = false;
+
+function generateBarcode() {
+
+  const value = document
+    .getElementById("barcodeText")
+    .value.trim();
+
+  const format = document
+    .getElementById("barcodeFormat")
+    .value;
+
+  const barcode = document.getElementById("barcode");
+  const message = document.getElementById("message");
+
+  barcode.innerHTML = "";
+  barcodeGenerated = false;
+
+  if (!value) {
+    message.style.color = "red";
+    message.innerText = "Please enter a barcode number or text.";
     return;
   }
 
-  try{
-    JsBarcode("#barcode",value,{
-      format:format,
-      width:2,
-      height:100,
-      displayValue:true,
-      margin:10,
-      background:"#ffffff",
-      lineColor:"#000000"
-    });
+  if (typeof JsBarcode === "undefined") {
+    message.style.color = "red";
+    message.innerText = "Barcode library not loaded. Please check your internet connection.";
+    return;
   }
-  catch(error){
-    alert("Invalid barcode value. Please check the format and number.");
+
+  if (format === "EAN13" && !/^\d{12,13}$/.test(value)) {
+    message.style.color = "red";
+    message.innerText = "EAN-13 requires 12 or 13 digits.";
+    return;
+  }
+
+  if (format === "UPC" && !/^\d{11,12}$/.test(value)) {
+    message.style.color = "red";
+    message.innerText = "UPC-A requires 11 or 12 digits.";
+    return;
+  }
+
+  try {
+
+    JsBarcode(barcode, value, {
+      format: format,
+      width: 2,
+      height: 100,
+      displayValue: true,
+      margin: 10,
+      background: "#ffffff",
+      lineColor: "#000000"
+    });
+
+    if (!barcode.querySelector("rect")) {
+      throw new Error("Barcode generation failed.");
+    }
+
+    barcodeGenerated = true;
+
+    message.style.color = "green";
+    message.innerText = "Barcode generated successfully!";
+
+  } catch (error) {
+
+    barcode.innerHTML = "";
+    barcodeGenerated = false;
+
+    message.style.color = "red";
+    message.innerText = "Invalid barcode. Please check your input.";
+
   }
 }
 
-function downloadBarcode(){
-  const svg=document.getElementById("barcode");
+function downloadBarcode() {
 
-  if(!svg.querySelector("rect") && !svg.querySelector("path")){
+  if (!barcodeGenerated) {
     alert("Please generate a barcode first.");
     return;
   }
 
-  const svgData=new XMLSerializer().serializeToString(svg);
-  const canvas=document.createElement("canvas");
-  const context=canvas.getContext("2d");
-  const image=new Image();
+  const svg = document.getElementById("barcode");
 
-  const blob=new Blob([svgData],{type:"image/svg+xml;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
+  const svgClone = svg.cloneNode(true);
 
-  image.onload=function(){
-    canvas.width=image.width*2;
-    canvas.height=image.height*2;
+  svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-    context.fillStyle="#ffffff";
-    context.fillRect(0,0,canvas.width,canvas.height);
-    context.drawImage(image,0,0,canvas.width,canvas.height);
+  const svgData = new XMLSerializer()
+    .serializeToString(svgClone);
 
-    const link=document.createElement("a");
-    link.download="FormMitra-Barcode.png";
-    link.href=canvas.toDataURL("image/png");
+  const blob = new Blob([svgData], {
+    type: "image/svg+xml;charset=utf-8"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const image = new Image();
+
+  image.onload = function() {
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = image.naturalWidth * 2;
+    canvas.height = image.naturalHeight * 2;
+
+    const context = canvas.getContext("2d");
+
+    context.fillStyle = "#ffffff";
+
+    context.fillRect(
+      0, 0,
+      canvas.width,
+      canvas.height
+    );
+
+    context.drawImage(
+      image,
+      0, 0,
+      canvas.width,
+      canvas.height
+    );
+
+    const link = document.createElement("a");
+
+    link.download = "FormMitra-Barcode.png";
+
+    link.href = canvas.toDataURL("image/png");
+
     link.click();
 
     URL.revokeObjectURL(url);
-    URL.revokeObjectURL(blob);
+
   };
 
-  image.src=url;
+  image.onerror = function() {
+
+    URL.revokeObjectURL(url);
+
+    alert("Unable to download barcode. Please try again.");
+
+  };
+
+  image.src = url;
+
 }
+
 </script>
 
 </body>

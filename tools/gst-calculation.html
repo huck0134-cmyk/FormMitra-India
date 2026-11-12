@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GST Calculator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:20px;
+  font-family:Arial,sans-serif;
+  background:#f3f6fb;
+  color:#222;
+}
+
+.container{
+  max-width:650px;
+  margin:25px auto;
+  padding:25px;
+  background:white;
+  border-radius:15px;
+  box-shadow:0 4px 20px #0001;
+}
+
+h1{
+  text-align:center;
+  color:#174ea6;
+}
+
+.subtitle{
+  text-align:center;
+  color:#666;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+input,select{
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  border:1px solid #ccc;
+  border-radius:7px;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  background:#174ea6;
+  color:white;
+  border:0;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#103875;
+}
+
+.result{
+  display:none;
+  margin-top:25px;
+  padding:20px;
+  background:#f0f5ff;
+  border-radius:12px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px 0;
+  border-bottom:1px solid #ddd;
+}
+
+.total{
+  font-size:21px;
+  color:#146c2e;
+  font-weight:bold;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:20px;
+  color:#174ea6;
+  text-decoration:none;
+}
+
+.note{
+  color:#777;
+  font-size:12px;
+  line-height:1.5;
+}
+
+@media(max-width:450px){
+  .container{padding:16px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧮 GST Calculator</h1>
+
+<p class="subtitle">
+Calculate GST, CGST, SGST and IGST instantly.
+</p>
+
+<label>Enter Amount (₹)</label>
+<input type="number" id="amount" placeholder="Example: 10000" min="0" step="any">
+
+<label>GST Rate (%)</label>
+<select id="gstRate">
+<option value="0">0%</option>
+<option value="5">5%</option>
+<option value="12">12%</option>
+<option value="18" selected>18%</option>
+<option value="28">28%</option>
+</select>
+
+<label>Calculation Type</label>
+<select id="calcType">
+<option value="exclusive">GST Exclusive (Add GST)</option>
+<option value="inclusive">GST Inclusive (Remove GST)</option>
+</select>
+
+<label>GST Type</label>
+<select id="gstType">
+<option value="intra">CGST + SGST (Same State)</option>
+<option value="inter">IGST (Different State)</option>
+</select>
+
+<button onclick="calculateGST()">Calculate GST</button>
+
+<div class="result" id="result">
+
+<h3>GST Calculation Result</h3>
+
+<div class="row">
+<strong>Original Amount</strong>
+<span id="base"></span>
+</div>
+
+<div class="row">
+<strong>CGST</strong>
+<span id="cgst"></span>
+</div>
+
+<div class="row">
+<strong>SGST</strong>
+<span id="sgst"></span>
+</div>
+
+<div class="row">
+<strong>IGST</strong>
+<span id="igst"></span>
+</div>
+
+<div class="row">
+<strong>Total GST</strong>
+<span id="gst"></span>
+</div>
+
+<div class="row total">
+<strong>Final Amount</strong>
+<span id="final"></span>
+</div>
+
+<button onclick="downloadReport()">
+Download GST Report
+</button>
+
+</div>
+
+<p class="note">
+Note: This calculator provides an arithmetic GST estimate.
+Verify the applicable GST rate, classification and tax treatment before issuing an invoice.
+</p>
+
+<a class="back" href="../index.html">
+← Back to FormMitra India
+</a>
+
+</div>
+
+<script>
+
+let report="";
+
+function formatMoney(value){
+  return "₹"+value.toLocaleString("en-IN",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
+function calculateGST(){
+
+  const amountInput=document.getElementById("amount");
+  const amount=Number(amountInput.value);
+
+  const rate=Number(document.getElementById("gstRate").value);
+  const type=document.getElementById("calcType").value;
+  const gstType=document.getElementById("gstType").value;
+
+  if(amountInput.value.trim()==="" || !Number.isFinite(amount) || amount<=0){
+    alert("Please enter a valid amount.");
+    return;
+  }
+
+  let baseAmount;
+  let gstAmount;
+  let finalAmount;
+
+  if(type==="exclusive"){
+
+    baseAmount=amount;
+    gstAmount=baseAmount*rate/100;
+    finalAmount=baseAmount+gstAmount;
+
+  }else{
+
+    finalAmount=amount;
+    baseAmount=amount/(1+rate/100);
+    gstAmount=finalAmount-baseAmount;
+
+  }
+
+  let cgst=0;
+  let sgst=0;
+  let igst=0;
+
+  if(gstType==="intra"){
+    cgst=gstAmount/2;
+    sgst=gstAmount/2;
+  }else{
+    igst=gstAmount;
+  }
+
+  document.getElementById("base").innerText=formatMoney(baseAmount);
+  document.getElementById("cgst").innerText=formatMoney(cgst);
+  document.getElementById("sgst").innerText=formatMoney(sgst);
+  document.getElementById("igst").innerText=formatMoney(igst);
+  document.getElementById("gst").innerText=formatMoney(gstAmount);
+  document.getElementById("final").innerText=formatMoney(finalAmount);
+
+  document.getElementById("result").style.display="block";
+
+  report=
+    "FORMMITRA INDIA - GST REPORT\n\n"+
+    "Entered Amount: "+formatMoney(amount)+"\n"+
+    "GST Rate: "+rate+"%\n"+
+    "Calculation Type: "+type+"\n"+
+    "GST Type: "+(gstType==="intra"?"CGST + SGST":"IGST")+"\n\n"+
+    "Taxable Amount: "+formatMoney(baseAmount)+"\n"+
+    "CGST: "+formatMoney(cgst)+"\n"+
+    "SGST: "+formatMoney(sgst)+"\n"+
+    "IGST: "+formatMoney(igst)+"\n"+
+    "Total GST: "+formatMoney(gstAmount)+"\n"+
+    "Final Amount: "+formatMoney(finalAmount);
+}
+
+function downloadReport(){
+
+  if(!report){
+    alert("Please calculate GST first.");
+    return;
+  }
+
+  const blob=new Blob([report],{
+    type:"text/plain;charset=utf-8"
+  });
+
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+
+  link.href=url;
+  link.download="FormMitra-GST-Report.txt";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+</script>
+
+</body>
+</html>

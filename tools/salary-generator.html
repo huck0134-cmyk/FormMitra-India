@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salary Slip Generator - FormMitra India</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  font-family:Arial,sans-serif;
+  background:#f3f6fb;
+  margin:0;
+  padding:20px;
+  color:#222;
+}
+
+.container{
+  max-width:750px;
+  margin:20px auto;
+  background:white;
+  padding:25px;
+  border-radius:14px;
+  box-shadow:0 4px 20px #0001;
+}
+
+h1{
+  text-align:center;
+  color:#174ea6;
+}
+
+.subtitle{
+  text-align:center;
+  color:#666;
+}
+
+label{
+  display:block;
+  margin-top:13px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:7px;
+  border:1px solid #ccc;
+  border-radius:7px;
+  font-size:15px;
+}
+
+.section-title{
+  margin-top:25px;
+  padding-bottom:8px;
+  color:#174ea6;
+  border-bottom:2px solid #174ea6;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:18px;
+  background:#174ea6;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#103875;
+}
+
+#slip{
+  display:none;
+  margin-top:30px;
+  padding:22px;
+  border:1px solid #ccc;
+  background:white;
+}
+
+.slip-header{
+  text-align:center;
+  border-bottom:2px solid #174ea6;
+  padding-bottom:15px;
+}
+
+.slip-header h2{
+  color:#174ea6;
+  margin-bottom:5px;
+}
+
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:20px 0;
+}
+
+.info div{
+  padding:8px;
+  background:#f3f6fb;
+  overflow-wrap:anywhere;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th,td{
+  border:1px solid #ddd;
+  padding:10px;
+  text-align:left;
+}
+
+th{
+  background:#eaf0fb;
+}
+
+.net{
+  margin-top:20px;
+  padding:16px;
+  background:#e8f5e9;
+  color:#146c2e;
+  font-size:22px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:20px;
+  color:#174ea6;
+  text-decoration:none;
+}
+
+.note{
+  color:#777;
+  font-size:12px;
+  line-height:1.5;
+}
+
+@media(max-width:500px){
+  .container{padding:15px}
+  .info{grid-template-columns:1fr}
+  th,td{padding:7px;font-size:13px}
+}
+
+@media print{
+  body{background:white;padding:0}
+  body *{visibility:hidden}
+  #slip,#slip *{visibility:visible}
+  #slip{
+    display:block!important;
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    margin:0;
+    border:none;
+  }
+  .no-print{display:none!important}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="no-print">
+
+<h1>💼 Salary Slip Generator</h1>
+<p class="subtitle">Create professional employee salary slips for free.</p>
+
+<h3 class="section-title">Company Details</h3>
+
+<label>Company Name</label>
+<input id="company" placeholder="Enter company name">
+
+<label>Company Address</label>
+<input id="address" placeholder="Enter company address">
+
+<h3 class="section-title">Employee Details</h3>
+
+<label>Employee Name</label>
+<input id="employee" placeholder="Employee full name">
+
+<label>Employee ID</label>
+<input id="empid" placeholder="Employee ID">
+
+<label>Designation</label>
+<input id="designation" placeholder="Job designation">
+
+<label>Department</label>
+<input id="department" placeholder="Department">
+
+<label>Salary Month</label>
+<input type="month" id="month">
+
+<label>Paid Days</label>
+<input type="number" id="days" placeholder="30" min="0" max="31">
+
+<h3 class="section-title">Earnings (₹)</h3>
+
+<label>Basic Salary</label>
+<input type="number" id="basic" placeholder="0" min="0">
+
+<label>HRA</label>
+<input type="number" id="hra" placeholder="0" min="0">
+
+<label>DA</label>
+<input type="number" id="da" placeholder="0" min="0">
+
+<label>Other Allowances</label>
+<input type="number" id="allowance" placeholder="0" min="0">
+
+<h3 class="section-title">Deductions (₹)</h3>
+
+<label>PF Deduction</label>
+<input type="number" id="pf" placeholder="0" min="0">
+
+<label>ESI Deduction</label>
+<input type="number" id="esi" placeholder="0" min="0">
+
+<label>Other Deductions</label>
+<input type="number" id="other" placeholder="0" min="0">
+
+<button onclick="generateSlip()">Generate Salary Slip</button>
+
+</div>
+
+<div id="slip">
+
+<div class="slip-header">
+<h2 id="sCompany">Company Name</h2>
+<p id="sAddress"></p>
+<h3>SALARY SLIP</h3>
+<p id="sMonth"></p>
+</div>
+
+<div class="info">
+<div><b>Employee:</b> <span id="sEmployee"></span></div>
+<div><b>Employee ID:</b> <span id="sEmpid"></span></div>
+<div><b>Designation:</b> <span id="sDesignation"></span></div>
+<div><b>Department:</b> <span id="sDepartment"></span></div>
+<div><b>Paid Days:</b> <span id="sDays"></span></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Earnings</th>
+<th>Amount (₹)</th>
+<th>Deductions</th>
+<th>Amount (₹)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic Salary</td>
+<td id="sBasic"></td>
+<td>PF</td>
+<td id="sPF"></td>
+</tr>
+<tr>
+<td>HRA</td>
+<td id="sHRA"></td>
+<td>ESI</td>
+<td id="sESI"></td>
+</tr>
+<tr>
+<td>DA</td>
+<td id="sDA"></td>
+<td>Other Deductions</td>
+<td id="sOther"></td>
+</tr>
+<tr>
+<td>Other Allowances</td>
+<td id="sAllowance"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<th>Gross Earnings</th>
+<th id="sGross"></th>
+<th>Total Deductions</th>
+<th id="sDeduction"></th>
+</tr>
+</tbody>
+</table>
+
+<div class="net">
+Net Salary: <span id="sNet"></span>
+</div>
+
+<p><b>Amount in Words:</b> <span id="sWords"></span></p>
+
+<p class="note">
+This salary slip is generated from the details entered by the user.
+Please verify all salary and deduction details before issuing.
+</p>
+
+<p style="text-align:center;margin-top:35px">
+Authorized Signature
+<br><br>
+________________________
+</p>
+
+</div>
+
+<div class="no-print" id="printButtons" style="display:none">
+<button onclick="window.print()">Download / Print Salary Slip PDF</button>
+</div>
+
+<a class="back no-print" href="../index.html">
+← Back to FormMitra India
+</a>
+
+</div>
+
+<script>
+
+function value(id){
+  return Number(document.getElementById(id).value || 0);
+}
+
+function money(amount){
+  return amount.toLocaleString("en-IN",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
+function setText(id,text){
+  document.getElementById(id).textContent=text;
+}
+
+function numberWords(number){
+
+  if(number===0)return "Zero Rupees Only";
+
+  const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+  const tens=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+
+  function convert(n){
+    if(n<20)return ones[n];
+    if(n<100)return tens[Math.floor(n/10)]+" "+ones[n%10];
+    if(n<1000)return ones[Math.floor(n/100)]+" Hundred "+convert(n%100);
+    if(n<100000)return convert(Math.floor(n/1000))+" Thousand "+convert(n%1000);
+    if(n<10000000)return convert(Math.floor(n/100000))+" Lakh "+convert(n%100000);
+    return convert(Math.floor(n/10000000))+" Crore "+convert(n%10000000);
+  }
+
+  return convert(Math.floor(number))+" Rupees Only";
+}
+
+function generateSlip(){
+
+  const company=document.getElementById("company").value.trim();
+  const employee=document.getElementById("employee").value.trim();
+  const empid=document.getElementById("empid").value.trim();
+  const month=document.getElementById("month").value;
+
+  if(!company||!employee||!empid||!month){
+    alert("Please enter company name, employee name, employee ID and salary month.");
+    return;
+  }
+
+  const fields=["basic","hra","da","allowance","pf","esi","other","days"];
+
+  for(const id of fields){
+    const input=document.getElementById(id);
+    if(input.value.trim()===""||!Number.isFinite(Number(input.value))||Number(input.value)<0){
+      alert("Please enter valid "+id+" details.");
+      input.focus();
+      return;
+    }
+  }
+
+  if(value("days")>31){
+    alert("Paid days cannot exceed 31.");
+    return;
+  }
+
+  const earnings=value("basic")+value("hra")+value("da")+value("allowance");
+  const deductions=value("pf")+value("esi")+value("other");
+  const net=earnings-deductions;
+
+  if(deductions>earnings){
+    alert("Total deductions cannot exceed gross earnings.");
+    return;
+  }
+
+  setText("sCompany",company);
+  setText("sAddress",document.getElementById("address").value.trim());
+  setText("sEmployee",employee);
+  setText("sEmpid",empid);
+  setText("sDesignation",document.getElementById("designation").value||"-");
+  setText("sDepartment",document.getElementById("department").value||"-");
+  setText("sMonth",new Date(month+"-01T12:00:00").toLocaleDateString("en-IN",{month:"long",year:"numeric"}));
+  setText("sDays",value("days"));
+
+  setText("sBasic",money(value("basic")));
+  setText("sHRA",money(value("hra")));
+  setText("sDA",money(value("da")));
+  setText("sAllowance",money(value("allowance")));
+
+  setText("sPF",money(value("pf")));
+  setText("sESI",money(value("esi")));
+  setText("sOther",money(value("other")));
+
+  setText("sGross","₹"+money(earnings));
+  setText("sDeduction","₹"+money(deductions));
+  setText("sNet","₹"+money(net));
+  setText("sWords",numberWords(net));
+
+  document.getElementById("slip").style.display="block";
+  document.getElementById("printButtons").style.display="block";
+
+  document.getElementById("slip").scrollIntoView({
+    behavior:"smooth"
+  });
+}
+
+</script>
+
+</body>
+</html>
