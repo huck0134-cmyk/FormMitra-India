@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Resizer - FormMitra India</title>
+<meta name="description" content="Resize photos online for free. Change image dimensions, reduce image size and download resized photos.">
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,sans-serif;
+ background:#f3f6fb;color:#222;
+}
+header{
+ background:#123b70;color:white;text-align:center;
+ padding:22px 12px;
+}
+header h1{margin:0;font-size:27px}
+header p{margin:8px 0 0;font-size:14px}
+.container{
+ max-width:650px;margin:25px auto;padding:20px;
+}
+.card{
+ background:white;padding:22px;border-radius:13px;
+ box-shadow:0 3px 15px #00000012;
+}
+h2{margin-top:0;color:#123b70}
+label{display:block;font-weight:bold;margin:15px 0 7px}
+input,select{
+ width:100%;padding:12px;border:1px solid #ccc;
+ border-radius:7px;font-size:15px;
+}
+.row{display:flex;gap:12px}
+.row>div{flex:1;min-width:0}
+button{
+ border:0;border-radius:7px;padding:13px;
+ font-size:15px;font-weight:bold;cursor:pointer;
+}
+.primary{background:#1769d2;color:white;width:100%;margin-top:18px}
+.download{background:#138b4b;color:white;width:100%;margin-top:12px}
+.reset{background:#e9edf4;color:#222;width:100%;margin-top:10px}
+button:hover{opacity:.9}
+.preview{
+ margin-top:20px;text-align:center;
+}
+.preview img{
+ max-width:100%;max-height:300px;
+ border-radius:8px;display:none;margin:auto;
+}
+.info{
+ background:#eef5ff;padding:12px;border-radius:7px;
+ margin-top:15px;font-size:14px;line-height:1.7;
+}
+#status{margin-top:12px;color:#c0392b;font-size:14px}
+footer{text-align:center;padding:20px;color:#666;font-size:13px}
+@media(max-width:450px){.row{gap:8px}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>FormMitra India</h1>
+<p>Free Online Photo Resizer</p>
+</header>
+
+<div class="container">
+<div class="card">
+
+<h2>Photo Resizer</h2>
+<p>Resize your photo online for free.</p>
+
+<label>Select Photo</label>
+<input type="file" id="photo" accept="image/*">
+
+<div class="preview">
+<img id="preview" alt="Photo preview">
+</div>
+
+<div class="row">
+<div>
+<label>Width (px)</label>
+<input type="number" id="width" min="1" placeholder="Example: 300">
+</div>
+<div>
+<label>Height (px)</label>
+<input type="number" id="height" min="1" placeholder="Example: 400">
+</div>
+</div>
+
+<label>Maintain Aspect Ratio</label>
+<select id="ratio">
+<option value="yes">Yes</option>
+<option value="no">No</option>
+</select>
+
+<label>Output Format</label>
+<select id="format">
+<option value="image/jpeg">JPG</option>
+<option value="image/png">PNG</option>
+<option value="image/webp">WEBP</option>
+</select>
+
+<label>Image Quality: <span id="qualityValue">80%</span></label>
+<input type="range" id="quality" min="10" max="100" value="80">
+
+<button class="primary" id="resizeBtn">Resize Photo</button>
+
+<div class="info" id="info">
+Original photo details will appear here.
+</div>
+
+<button class="download" id="downloadBtn" style="display:none">
+Download Resized Photo
+</button>
+
+<button class="reset" onclick="resetTool()">Reset</button>
+
+<p id="status"></p>
+
+</div>
+</div>
+
+<footer>
+© 2026 FormMitra India | Free Online Tools
+</footer>
+
+<script>
+const photo = document.getElementById("photo");
+const preview = document.getElementById("preview");
+const widthInput = document.getElementById("width");
+const heightInput = document.getElementById("height");
+const ratio = document.getElementById("ratio");
+const format = document.getElementById("format");
+const quality = document.getElementById("quality");
+const qualityValue = document.getElementById("qualityValue");
+const info = document.getElementById("info");
+const status = document.getElementById("status");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let originalImage = new Image();
+let originalFileName = "resized-photo";
+let resizedBlob = null;
+let imageURL = null;
+
+function formatSize(bytes){
+ if(bytes < 1024) return bytes + " Bytes";
+ if(bytes < 1024*1024) return (bytes/1024).toFixed(2)+" KB";
+ return (bytes/(1024*1024)).toFixed(2)+" MB";
+}
+
+photo.addEventListener("change", function(){
+ const file = this.files[0];
+ if(!file) return;
+
+ if(!file.type.startsWith("image/")){
+ status.textContent="Please select a valid image.";
+ return;
+ }
+
+ if(imageURL) URL.revokeObjectURL(imageURL);
+ imageURL=URL.createObjectURL(file);
+
+ originalFileName=file.name.replace(/\.[^/.]+$/,"");
+
+ originalImage.onload=function(){
+ preview.src=imageURL;
+ preview.style.display="block";
+
+ widthInput.value=originalImage.naturalWidth;
+ heightInput.value=originalImage.naturalHeight;
+
+ info.innerHTML=
+ "Original Width: "+originalImage.naturalWidth+" px<br>"+
+ "Original Height: "+originalImage.naturalHeight+" px<br>"+
+ "Original Size: "+formatSize(file.size);
+
+ status.textContent="";
+ resizedBlob=null;
+ downloadBtn.style.display="none";
+ };
+
+ originalImage.src=imageURL;
+});
+
+widthInput.addEventListener("input",function(){
+ if(ratio.value==="yes" && originalImage.naturalWidth){
+ heightInput.value=Math.round(
+ Number(widthInput.value)*originalImage.naturalHeight/
+ originalImage.naturalWidth
+ );
+ }
+});
+
+heightInput.addEventListener("input",function(){
+ if(ratio.value==="yes" && originalImage.naturalHeight){
+ widthInput.value=Math.round(
+ Number(heightInput.value)*originalImage.naturalWidth/
+ originalImage.naturalHeight
+ );
+ }
+});
+
+ratio.addEventListener("change",function(){
+ if(this.value==="yes" && originalImage.naturalWidth){
+ heightInput.value=Math.round(
+ Number(widthInput.value)*originalImage.naturalHeight/
+ originalImage.naturalWidth
+ );
+ }
+});
+
+quality.addEventListener("input",function(){
+ qualityValue.textContent=this.value+"%";
+});
+
+document.getElementById("resizeBtn").addEventListener("click",function(){
+
+ if(!originalImage.src || !originalImage.naturalWidth){
+ status.textContent="Please select a photo first.";
+ return;
+ }
+
+ const w=Number(widthInput.value);
+ const h=Number(heightInput.value);
+
+ if(!Number.isInteger(w)||!Number.isInteger(h)||w<1||h<1){
+ status.textContent="Please enter valid width and height.";
+ return;
+ }
+
+ if(w>10000||h>10000){
+ status.textContent="Maximum dimension allowed is 10000 px.";
+ return;
+ }
+
+ const canvas=document.createElement("canvas");
+ canvas.width=w;
+ canvas.height=h;
+
+ const ctx=canvas.getContext("2d");
+
+ if(format.value==="image/jpeg"){
+ ctx.fillStyle="#ffffff";
+ ctx.fillRect(0,0,w,h);
+ }
+
+ ctx.drawImage(originalImage,0,0,w,h);
+
+ canvas.toBlob(function(blob){
+ if(!blob){
+ status.textContent="Image could not be processed. Try another format.";
+ return;
+ }
+
+ resizedBlob=blob;
+
+ info.innerHTML=
+ "New Width: "+w+" px<br>"+
+ "New Height: "+h+" px<br>"+
+ "New Size: "+formatSize(blob.size)+"<br>"+
+ "Format: "+format.value.split("/")[1].toUpperCase();
+
+ downloadBtn.style.display="block";
+ status.style.color="green";
+ status.textContent="Photo resized successfully!";
+
+ },format.value,Number(quality.value)/100);
+});
+
+downloadBtn.addEventListener("click",function(){
+ if(!resizedBlob) return;
+
+ const url=URL.createObjectURL(resizedBlob);
+ const extension=format.value.split("/")[1].replace("jpeg","jpg");
+ const a=document.createElement("a");
+
+ a.href=url;
+ a.download=originalFileName+"-resized."+extension;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+function resetTool(){
+ photo.value="";
+ preview.src="";
+ preview.style.display="none";
+ widthInput.value="";
+ heightInput.value="";
+ info.textContent="Original photo details will appear here.";
+ status.textContent="";
+ status.style.color="#c0392b";
+ downloadBtn.style.display="none";
+ resizedBlob=null;
+ if(imageURL) URL.revokeObjectURL(imageURL);
+ imageURL=null;
+ originalImage=new Image();
+}
+</script>
+</body>
+</html>

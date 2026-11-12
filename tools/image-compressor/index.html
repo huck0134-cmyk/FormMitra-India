@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Compressor - FormMitra India</title>
+<meta name="description" content="Compress images online for free. Reduce JPG, PNG and WEBP image size and download compressed photos.">
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#222}
+header{background:#123b70;color:white;text-align:center;padding:22px 12px}
+header h1{margin:0;font-size:27px}
+header p{margin:8px 0 0;font-size:14px}
+.container{max-width:650px;margin:25px auto;padding:15px}
+.card{background:white;padding:22px;border-radius:13px;box-shadow:0 3px 15px #00000012}
+h2{color:#123b70;margin-top:0}
+label{display:block;font-weight:bold;margin:16px 0 8px}
+input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px}
+button{border:0;border-radius:7px;padding:13px;font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:#1769d2;color:white;width:100%;margin-top:20px}
+.download{background:#138b4b;color:white;width:100%;margin-top:12px}
+.reset{background:#e9edf4;color:#222;width:100%;margin-top:10px}
+button:hover{opacity:.9}
+.preview{text-align:center;margin-top:20px}
+.preview img{max-width:100%;max-height:280px;border-radius:8px;display:none;margin:auto}
+.info{background:#eef5ff;padding:13px;border-radius:8px;margin-top:15px;line-height:1.8;font-size:14px}
+#status{font-size:14px;margin-top:12px}
+.range-value{color:#1769d2}
+footer{text-align:center;padding:20px;color:#666;font-size:13px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>FormMitra India</h1>
+<p>Free Online Image Compressor</p>
+</header>
+
+<div class="container">
+<div class="card">
+
+<h2>Image Compressor</h2>
+<p>Reduce your image size without installing any software.</p>
+
+<label>Select Image</label>
+<input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp">
+
+<div class="preview">
+<img id="preview" alt="Image preview">
+</div>
+
+<div class="info" id="originalInfo">
+Original image details will appear here.
+</div>
+
+<label>Image Quality: <span class="range-value" id="qualityValue">70%</span></label>
+<input type="range" id="quality" min="10" max="100" value="70">
+
+<label>Output Format</label>
+<select id="format">
+<option value="image/jpeg">JPG</option>
+<option value="image/webp">WEBP</option>
+<option value="image/png">PNG</option>
+</select>
+
+<button class="primary" id="compressBtn">Compress Image</button>
+
+<div class="info" id="resultInfo" style="display:none"></div>
+
+<button class="download" id="downloadBtn" style="display:none">
+Download Compressed Image
+</button>
+
+<button class="reset" onclick="resetTool()">Reset</button>
+
+<p id="status"></p>
+
+</div>
+</div>
+
+<footer>
+© 2026 FormMitra India | Free Online Tools
+</footer>
+
+<script>
+const imageInput=document.getElementById("imageInput");
+const preview=document.getElementById("preview");
+const quality=document.getElementById("quality");
+const qualityValue=document.getElementById("qualityValue");
+const format=document.getElementById("format");
+const originalInfo=document.getElementById("originalInfo");
+const resultInfo=document.getElementById("resultInfo");
+const status=document.getElementById("status");
+const downloadBtn=document.getElementById("downloadBtn");
+
+let originalImage=new Image();
+let originalFile=null;
+let compressedBlob=null;
+let imageURL=null;
+let fileName="compressed-image";
+
+function formatSize(bytes){
+ if(bytes<1024)return bytes+" Bytes";
+ if(bytes<1024*1024)return (bytes/1024).toFixed(2)+" KB";
+ return (bytes/(1024*1024)).toFixed(2)+" MB";
+}
+
+imageInput.addEventListener("change",function(){
+ const file=this.files[0];
+ if(!file)return;
+
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+ status.textContent="Please select JPG, PNG or WEBP image.";
+ return;
+ }
+
+ if(imageURL)URL.revokeObjectURL(imageURL);
+
+ originalFile=file;
+ fileName=file.name.replace(/\.[^/.]+$/,"");
+ imageURL=URL.createObjectURL(file);
+
+ originalImage.onload=function(){
+ preview.src=imageURL;
+ preview.style.display="block";
+
+ originalInfo.innerHTML=
+ "<b>Original Image Details</b><br>"+
+ "File Name: "+file.name+"<br>"+
+ "Width: "+originalImage.naturalWidth+" px<br>"+
+ "Height: "+originalImage.naturalHeight+" px<br>"+
+ "Original Size: "+formatSize(file.size);
+
+ resultInfo.style.display="none";
+ downloadBtn.style.display="none";
+ compressedBlob=null;
+ status.textContent="";
+ };
+
+ originalImage.onerror=function(){
+ status.textContent="Unable to open this image.";
+ };
+
+ originalImage.src=imageURL;
+});
+
+quality.addEventListener("input",function(){
+ qualityValue.textContent=this.value+"%";
+});
+
+document.getElementById("compressBtn").addEventListener("click",function(){
+
+ if(!originalFile||!originalImage.naturalWidth){
+ status.textContent="Please select an image first.";
+ return;
+ }
+
+ const canvas=document.createElement("canvas");
+ canvas.width=originalImage.naturalWidth;
+ canvas.height=originalImage.naturalHeight;
+
+ const ctx=canvas.getContext("2d");
+
+ if(format.value==="image/jpeg"){
+ ctx.fillStyle="#ffffff";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+ }
+
+ ctx.drawImage(originalImage,0,0);
+
+ canvas.toBlob(function(blob){
+
+ if(!blob){
+ status.textContent="Compression failed. Please try another format.";
+ return;
+ }
+
+ compressedBlob=blob;
+
+ const originalSize=originalFile.size;
+ const newSize=blob.size;
+ const saved=originalSize>0?
+ ((originalSize-newSize)/originalSize*100):0;
+
+ resultInfo.style.display="block";
+ resultInfo.innerHTML=
+ "<b>Compressed Image Details</b><br>"+
+ "Original Size: "+formatSize(originalSize)+"<br>"+
+ "Compressed Size: "+formatSize(newSize)+"<br>"+
+ "Space Saved: "+saved.toFixed(2)+"%<br>"+
+ "Output Format: "+format.value.split("/")[1].toUpperCase();
+
+ downloadBtn.style.display="block";
+
+ if(newSize<originalSize){
+ status.style.color="green";
+ status.textContent="Image compressed successfully!";
+ }else{
+ status.style.color="#b45309";
+ status.textContent="This format did not reduce the file size. Try JPG or WEBP with lower quality.";
+ }
+
+ },format.value,Number(quality.value)/100);
+});
+
+downloadBtn.addEventListener("click",function(){
+
+ if(!compressedBlob)return;
+
+ const url=URL.createObjectURL(compressedBlob);
+ const extension=format.value.split("/")[1].replace("jpeg","jpg");
+
+ const a=document.createElement("a");
+ a.href=url;
+ a.download=fileName+"-compressed."+extension;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+function resetTool(){
+ imageInput.value="";
+ preview.src="";
+ preview.style.display="none";
+ originalInfo.textContent="Original image details will appear here.";
+ resultInfo.style.display="none";
+ downloadBtn.style.display="none";
+ status.textContent="";
+ quality.value=70;
+ qualityValue.textContent="70%";
+ compressedBlob=null;
+ originalFile=null;
+
+ if(imageURL)URL.revokeObjectURL(imageURL);
+ imageURL=null;
+ originalImage=new Image();
+}
+</script>
+
+</body>
+</html>
