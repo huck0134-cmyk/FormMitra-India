@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FormMitra India
 
 A beginner-friendly static website project for photo and document preparation tools.
@@ -31,3 +32,7 @@ Other cards are labelled “Coming soon” and are not implemented yet.
 - Do not add AdSense until the website has original useful content and complies with Google policies.
 
 This is a static front-end project. It does not include a server, database, admin panel, or user-upload storage.
+=======
+# FormMitra-India
+FormMitra India – Your Free Online Tools Platform  FormMitra India is a free, user-friendly online platform designed to make everyday photo and document tasks easier. Users can access useful tools for photo resizing, image compression, passport-size photos, PDF editing,  Website: https://huck0134-cmyk.github.io/Formmitra-india/
+>>>>>>> b40abc56d606d850089db455240c84f4f1adcba0
